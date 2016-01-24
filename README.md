@@ -1,7 +1,7 @@
 # gb-sketch-segmentcircle
 Create circles as areas or lines with a custom number of points/segments
 
-![](https://raw.githubusercontent.com/design4use/gb-sketch-segmentcircle/master/img/screenshot.png)
+![](https://raw.githubusercontent.com/design4use/gb-sketch-segmentcircle/master/img/screencapture.png)
 
 ## Updates
 ##### Jan 24, 2016
