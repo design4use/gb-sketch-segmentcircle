@@ -1,10 +1,10 @@
 {
     "name": "Segmented Circle",
-    "description" : "A plugin that does creates a circle with a configurable number of segments.",
+    "description" : "A plugin that creates a circle with a configurable number of segments.",
     "author" : "German Bauer",
     "authorEmail" : "design4use@gmail.com",
     "homepage": "https://github.com/",
-    "version" : "1.0",
+    "version" : "1.01",
     "identifier" : "com.germanbauer.gb-segmented_circle",
     "compatibleVersion": "3.4",
     "bundleVersion": "1",

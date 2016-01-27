@@ -1,5 +1,5 @@
 
-var doc, pi, segs, r, thickness, pArray, def, scrollOrigin, zoomValue
+var doc, pi, segs, r, thickness, pArray, def, scrollOrigin, zoomValue, sv
 
 var onRun = function(context) {
   // Global variables
@@ -10,7 +10,7 @@ var onRun = function(context) {
   thickness = 20
   pArray = []
   def = [NSUserDefaults standardUserDefaults]
-
+  sv = getSkVer()
   //actual functions
   start(context)
 }
@@ -40,11 +40,10 @@ var start = function(context){
 
 //computation
 var multiSegmentCircle = function(numSegs){
-	//compute ideal cp handle length
+	//compute ideal handle length
 	var lSeg = 2 * pi / numSegs
 	var lCpHandle = r * 4 / 3 * (Math.tan(pi / (2 * numSegs)))
-	//log(lCpHandle)
-
+	
 	for(var i = 0; i < numSegs; i++){
 		var aGeomFactor = 	[Math.cos(lSeg * i - pi/2), Math.sin(lSeg * i - pi/2)]
 		var pAnchor = 		[rd2dec(aGeomFactor[0] * r), rd2dec(aGeomFactor[1] * r)]
@@ -115,8 +114,13 @@ function multiSegmentDonut(numSegs, nThick){
         //add to group
         gr.addLayers([shape]);
 	}
-	placeLayer(gr)// do this for the group
+
+  placeLayer(gr)
+  if(sv <= 34400) {
     gr.resizeRoot(true)
+  } else {
+    gr.resizeToFitChildrenWithOption(0)
+  }
 }
 
 
@@ -149,11 +153,16 @@ var placeLayer = function(lyr){
     var zv = [doc zoomValue]
     var vX = (v.size.width / 2 - so.x) / zv;
     var vY = (v.size.height / 2 - so.y) / zv;
-    //alert(vX + ", " + vY, "Viewport statistics")
     rL.origin.x = vX
-    // + rL.size.width
     rL.origin.y = vY
-    // + rL.size.height
-    //alert(rL, "Object statistics")
     lyr.setRect(rL)
+}
+
+var getSkVer = function() {
+	var v = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]
+	var v2 = v.split('.').join("")
+	do {
+		v2 = v2 + "0"
+	} while(v2.length <= 4)
+	return (Number(v2) + 0)
 }
