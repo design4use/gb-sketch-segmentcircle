@@ -4,8 +4,10 @@ Create circles as areas or lines with a custom number of points/segments
 ![](https://raw.githubusercontent.com/design4use/gb-sketch-segmentcircle/master/img/screencapture.png)
 
 ## Latest updates
+
 ##### Jan 27, 2016
 * 1.01 version, updated to also support 3.5
+
 ##### Jan 24, 2016
 * 1.0 version, supports Sketch 3.4
 
