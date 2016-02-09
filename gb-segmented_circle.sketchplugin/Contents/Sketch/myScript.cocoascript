@@ -35,8 +35,10 @@ var start = function(context){
         [def setObject:(r + "," + segs) forKey:key]//set defaults to this value
         multiSegmentCircle(segs)
     }
-    //alert(computeLargeBezierArc(0, 3*pi/4, 100), "arc test")//alert = function(sText, sTitle)
+    //alert(computeBezierAr2(pi/2, 0, 100), "arc test")//alert = function(sText, sTitle)
     varSegmentCircle([50,30,20])
+    //alert(preProcSeg([50,30,10,10]),"Preprocessed segments → anchor angles:")
+    //varSegmentDonut([50,30,20], 20)//debug
 }
 
 var multiSegmentCircle = function(numSegs){
@@ -44,10 +46,10 @@ var multiSegmentCircle = function(numSegs){
   var path = NSBezierPath.bezierPath()
 
   for(var i = 0; i < numSegs; i++){
-    var aPts = computeBezierArc(i * angSeg, (i+1) * angSeg, r)
+    var aPts = computeBezierAr2(i * angSeg, (i+1) * angSeg, r)
     //alert(aPts, "arc test")//alert = function(sText, sTitle)
-    if(i == 0) {path.moveToPoint(NSMakePoint(aPts.ancStart[0], aPts.ancStart[1]))}
-    [path curveToPoint:NSMakePoint(aPts.ancEnd[0], aPts.ancEnd[1]) controlPoint1:NSMakePoint(aPts.leftStart[0], aPts.leftStart[1]) controlPoint2:NSMakePoint(aPts.rightEnd[0], aPts.rightEnd[1])]
+    if(i == 0) {path.moveToPoint(NSMakePoint(aPts.aBeg[0], aPts.aBeg[1]))}
+    [path curveToPoint:NSMakePoint(aPts.aEnd[0], aPts.aEnd[1]) controlPoint1:NSMakePoint(aPts.cPt1[0], aPts.cPt1[1]) controlPoint2:NSMakePoint(aPts.cPt2[0], aPts.cPt2[1])]
   }
 
   var shape = MSShapeGroup.shapeWithBezierPath(path);
@@ -64,20 +66,45 @@ var multiSegmentCircle = function(numSegs){
 var varSegmentCircle = function(aSegments){
   var numSegs = aSegments.length
   var aSegs = preProcSeg(aSegments)
-  alert(aSegments,"Test")
-  var currAng = 0.0
-  pArray = []
+  alert(aSegments + " → " + aSegs,"Test")
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Variable segments circle")
   for(var i = 0; i < numSegs; i++){
     //build each of the segments
+    alert("from " + aSegs[i] + " to " + aSegs[i + 1], "Segment being computed: #" + i)
     var path = NSBezierPath.bezierPath()
-    var aPts = computeLargeBezierArc(currAng, currAng + aSegs[i], r)
+    var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], r)
     for(var j = 0; j < aPts.length; j++){
-      if(j == 0) {path.moveToPoint(NSMakePoint(aPts[0].ancStart[0], aPts[0].ancStart[1]))}
-      [path curveToPoint:NSMakePoint(aPts[j].ancEnd[0], aPts[j].ancEnd[1]) controlPoint1:NSMakePoint(aPts[j].leftStart[0], aPts[j].leftStart[1]) controlPoint2:NSMakePoint(aPts[j].rightEnd[0], aPts[j].rightEnd[1])]
+      if(j == 0) {path.moveToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
+      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
     }
+    var shape = MSShapeGroup.shapeWithBezierPath(path);
+    styleShape(shape)
+    shape.setName("Segment " + (aSegments[i]))
+    gr.addLayers([shape]);
+  }
+  placeLayer(gr)
+}
+
+var varSegmentDonut = function(aSegments, nThick){
+  var numSegs = aSegments.length
+  var aSegs = preProcSeg(aSegments)
+  alert(aSegments + " → " + aSegs,"Test")
+
+  var gr = doc.currentPage().addLayerOfType("group")
+  gr.setName("Variable segments donut")
+  for(var i = 0; i < numSegs; i++){
+    //build each of the segments
+    var aPts = computeLargeBezierAr2(currAng, currAng + aSegs[i], r)
+    alert(aPts,"aPoints")
+    var nP = aPts.length
+    var path = NSBezierPath.bezierPath()
+    for(var j = 0; j < nP; j++){
+      if(j == 0) {path.moveToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
+      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
+    }
+
     currAng += aSegs[i]
     var shape = MSShapeGroup.shapeWithBezierPath(path);
     styleShape(shape)
@@ -148,18 +175,38 @@ var computeBezierArc = function(angStart, angEnd, rSeg){
   return {ancStart:pAnchor1, leftStart:pLe1, rightStart:pRi1, ancEnd:pAnchor2, leftEnd:pLe2, rightEnd:pRi2}
 }
 
+var computeBezierAr2 = function(angStart, angEnd, rSeg){
+  //compute single segment with start and end angle and radius
+  var lSeg = angEnd - angStart
+  var lCpHandle = rSeg * 4 / 3 * (Math.tan(lSeg / 4))
+  //alert("length of cp handle is " + lCpHandle, "Test")
+  var aGeomFactor = [Math.cos(angStart - pi/2), Math.sin(angStart - pi/2)]
+  var pAnchor1 = 		[rd2dec(aGeomFactor[0] * rSeg), rd2dec(aGeomFactor[1] * rSeg)]
+  var pLe1 =        [pAnchor1[0] - rd2dec(aGeomFactor[1] * lCpHandle), pAnchor1[1] + rd2dec(aGeomFactor[0] * lCpHandle)]
+  var pRi1 =        [pAnchor1[0] + rd2dec(aGeomFactor[1] * lCpHandle), pAnchor1[1] - rd2dec(aGeomFactor[0] * lCpHandle)]
+  //alert("GFact1 is " + aGeomFactor, "Test")
+  aGeomFactor =     [Math.cos(angEnd - pi/2), Math.sin(angEnd - pi/2)]
+  var pAnchor2 =    [rd2dec(aGeomFactor[0] * rSeg), rd2dec(aGeomFactor[1] * rSeg)]
+  var pLe2 =        [pAnchor2[0] - rd2dec(aGeomFactor[1] * lCpHandle), pAnchor2[1] + rd2dec(aGeomFactor[0] * lCpHandle)]
+  var pRi2 =        [pAnchor2[0] + rd2dec(aGeomFactor[1] * lCpHandle), pAnchor2[1] - rd2dec(aGeomFactor[0] * lCpHandle)]
+
+  return {aBeg:pAnchor1, cPt1:pLe1, cPt2:pRi2, aEnd:pAnchor2}
+}
+
 var computeLargeBezierArc = function(angStart, angEnd, rSeg){
   //return path points for n arcs > ideal segments
   var angIdeal = 2 * pi / idealsegs
-  var nIdeal = Math.floor(Math.abs((angEnd - angStart) / angIdeal))
+  var nIdeal = Math.trunc((angEnd - angStart) / angIdeal)
+  //var aRem = (angEnd - angStart) % angIdeal
+  if(nIdeal < 0){angIdeal *= (-1);nIdeal *= (-1);}//CCW
   var aPts = []
   var angCurr = angStart
   for(i = 0; i < nIdeal + 1; i++){
     if(i < nIdeal) {
-      aPts.push(computeBezierArc(angCurr, angCurr + angIdeal, r))//fill with ideal sized segments
+      aPts.push(computeBezierAr2(angCurr, angCurr + angIdeal, r))//fill with ideal sized segments
       angCurr += angIdeal
     } else {
-      if((angEnd - angCurr) > 0.00001){ aPts.push(computeBezierArc(angCurr, angEnd, r))} //end with smaller sized remainder
+      if(Math.abs(angEnd - angCurr) > 0.00001){ aPts.push(computeBezierAr2(angCurr, angEnd, r))} //end with smaller sized remainder
     }
   }
   return aPts;
@@ -171,12 +218,14 @@ var rd2dec = function(num) {
 
 var preProcSeg = function(aSegments){
   //normalize to 6.28
-  var aSegs = []
+  var aSegs = [0]
   var total = 0;
   var n = aSegments.length;
   var i = n;
   while (i--) {total += aSegments[i]}
-  for (i=0; i<n; i++) {aSegs.push(aSegments[i] * (2 * pi / total))}
+  var factor = 2 * pi / total
+  for (i=1; i<=n; i++) {aSegs.push(aSegs[i-1] + (aSegments[i-1] * factor))}
+  aSegs[aSegs.length - 1] = 6.28
   return aSegs
 }
 
