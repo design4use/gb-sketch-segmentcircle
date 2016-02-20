@@ -96,12 +96,22 @@ var varSegmentDonut = function(aSegments, nThick){
   gr.setName("Variable segments donut")
   for(var i = 0; i < numSegs; i++){
     //build each of the segments
+
     var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], r)
-    alert(aPts,"aPoints")
+    //alert(aPts,"aPoints")
     var nP = aPts.length
     var path = NSBezierPath.bezierPath()
     for(var j = 0; j < nP; j++){
       if(j == 0) {path.moveToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
+      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
+    }
+
+    var aPts = computeLargeBezierArc(aSegs[i+1], aSegs[i], r-nThick)
+    alert(aPts,"aPoints")
+    var nP = aPts.length
+    //var path = NSBezierPath.bezierPath()
+    for(var j = 0; j < nP; j++){
+      if(j == 0) {path.lineToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
       [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
     }
 
