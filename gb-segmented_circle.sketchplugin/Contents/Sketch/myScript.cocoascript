@@ -95,26 +95,27 @@ var varSegmentDonut = function(aSegments, nThick){
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Variable segments donut")
   for(var i = 0; i < numSegs; i++){
+    var path = NSBezierPath.bezierPath()
     //build each of the segments
 
     var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], r)
-    //alert(aPts,"aPoints")
     var nP = aPts.length
-    var path = NSBezierPath.bezierPath()
+    alert(aSegments[i] + ": " + (aSegs[i]) + " to " + (aSegs[i + 1]),"Calculating segment out")
     for(var j = 0; j < nP; j++){
-      if(j == 0) {path.moveToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
+      if(j == 0) {[path moveToPoint:NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1])]}
       [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
     }
 
-    var aPts = computeLargeBezierArc(aSegs[i+1], aSegs[i], r-nThick)
-    alert(aPts,"aPoints")
-    var nP = aPts.length
-    //var path = NSBezierPath.bezierPath()
-    for(var j = 0; j < nP; j++){
-      if(j == 0) {path.lineToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
-      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
+    var rIn = r - nThick
+    var aPt2 = computeLargeBezierArc(aSegs[i + 1], aSegs[i], rIn)
+    n2 = aPt2.length
+    alert(aSegments[i] + ": " + (aSegs[i + 1]) + " to " + (aSegs[i]),"Calculating segment back")
+    for(var k = 0; k < n2; k++){
+      if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
+      [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
     }
 
+    [path closePath]
     var shape = MSShapeGroup.shapeWithBezierPath(path);
     styleShape(shape)
     shape.setName("Segment " + (aSegments[i]))
@@ -194,10 +195,10 @@ var computeLargeBezierArc = function(angStart, angEnd, rSeg){
   var angCurr = angStart
   for(i = 0; i < nIdeal + 1; i++){
     if(i < nIdeal) {
-      aPts.push(computeBezierArc(angCurr, angCurr + angIdeal, r))//fill with ideal sized segments
+      aPts.push(computeBezierArc(angCurr, angCurr + angIdeal, rSeg))//fill with ideal sized segments
       angCurr += angIdeal
     } else {
-      if(Math.abs(angEnd - angCurr) > 0.00001){ aPts.push(computeBezierArc(angCurr, angEnd, r))} //end with smaller sized remainder
+      if(Math.abs(angEnd - angCurr) > 0.00001){ aPts.push(computeBezierArc(angCurr, angEnd, rSeg))} //end with smaller sized remainder
     }
   }
   return aPts;
