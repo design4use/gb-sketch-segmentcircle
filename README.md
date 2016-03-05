@@ -1,5 +1,5 @@
 # gb-sketch-segmentcircle
-Create circles as areas or lines with a custom number of points/segments
+Create circles as areas or lines with a custom number of points/segments for analytics, graphs and dashboards.
 
 ![](https://raw.githubusercontent.com/design4use/gb-sketch-segmentcircle/master/img/screencapture.png)
 
@@ -12,7 +12,7 @@ Create circles as areas or lines with a custom number of points/segments
 * 1.0 version, supports Sketch 3.4
 
 ## Description
-For when you want to create those circular segmented objects as seen in gauges or fitness apps.
+For when you want to create those circular segmented objects as seen in analytics or fitness apps.
 A dialog will ask for 3 comma separated values: radius , number of segments and thickness. Thickness is optional and describes the thickness of the "donut" created. If this value is set to zero or omitted the segmented circle gets created as a line. Preserves last used value across sessions.
 
 ## Installation

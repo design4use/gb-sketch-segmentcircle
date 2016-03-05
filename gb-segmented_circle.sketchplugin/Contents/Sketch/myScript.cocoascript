@@ -38,7 +38,7 @@ var start = function(context){
     //alert(computeBezierArc(pi/2, 0, 100), "arc test")//alert = function(sText, sTitle)
     //varSegmentCircle([50,30,20])
     //alert(preProcSeg([50,30,10,10]),"Preprocessed segments → anchor angles:")
-    varSegmentDonut([50,30,20], 20)//debug
+    varSegmentDonut([40,30,20,10,5,2,1,0.5], 50)//debug
 }
 
 var multiSegmentCircle = function(numSegs){
@@ -90,7 +90,7 @@ var varSegmentCircle = function(aSegments){
 var varSegmentDonut = function(aSegments, nThick){
   var numSegs = aSegments.length
   var aSegs = preProcSeg(aSegments)
-  alert(aSegments + " → " + aSegs,"Test")
+  //alert(aSegments + " → " + aSegs,"Test")
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Variable segments donut")
@@ -100,7 +100,7 @@ var varSegmentDonut = function(aSegments, nThick){
 
     var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], r)
     var nP = aPts.length
-    alert(aSegments[i] + ": " + (aSegs[i]) + " to " + (aSegs[i + 1]),"Calculating segment out")
+    //alert(aSegments[i] + ": " + (aSegs[i]) + " to " + (aSegs[i + 1]),"Calculating segment out")
     for(var j = 0; j < nP; j++){
       if(j == 0) {[path moveToPoint:NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1])]}
       [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
@@ -109,7 +109,7 @@ var varSegmentDonut = function(aSegments, nThick){
     var rIn = r - nThick
     var aPt2 = computeLargeBezierArc(aSegs[i + 1], aSegs[i], rIn)
     n2 = aPt2.length
-    alert(aSegments[i] + ": " + (aSegs[i + 1]) + " to " + (aSegs[i]),"Calculating segment back")
+    //alert(aSegments[i] + ": " + (aSegs[i + 1]) + " to " + (aSegs[i]),"Calculating segment back")
     for(var k = 0; k < n2; k++){
       if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
       [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
@@ -117,7 +117,7 @@ var varSegmentDonut = function(aSegments, nThick){
 
     [path closePath]
     var shape = MSShapeGroup.shapeWithBezierPath(path);
-    styleShape(shape)
+    styleShapeArea(shape)
     shape.setName("Segment " + (aSegments[i]))
     gr.addLayers([shape]);
   }
@@ -236,6 +236,15 @@ var styleShape = function(shapeGr){
     var border = shapeGr.style().borders().addNewStylePart();
     border.color = MSColor.colorWithSVGString("#000066");
     border.thickness = 2;
+    //border.position = 1;
+}
+
+var styleShapeArea = function(shapeGr){
+    var fill = shapeGr.style().fills().addNewStylePart();
+    fill.color = MSColor.colorWithSVGString("#cccccc");
+    var border = shapeGr.style().borders().addNewStylePart();
+    border.color = MSColor.colorWithSVGString("#f0f0f0");
+    border.thickness = 1;
     //border.position = 1;
 }
 
