@@ -38,7 +38,8 @@ var start = function(context){
     //alert(computeBezierArc(pi/2, 0, 100), "arc test")//alert = function(sText, sTitle)
     //varSegmentCircle([50,30,20])
     //alert(preProcSeg([50,30,10,10]),"Preprocessed segments → anchor angles:")
-    varSegmentDonut([40,30,20,10,5,2,1,0.5], 50)//debug
+    //varSegmentDonut([40,30,20,10,5,2,1,0.5], 50)//debug
+    dashedCircle(100, 40, 20, 1)//debug
 }
 
 var multiSegmentCircle = function(numSegs){
@@ -166,6 +167,62 @@ var multiSegmentDonut = function(numSegs, nThick){
 
   placeLayer(gr)
 }
+
+var ticksCircle = function(rCirc, numMin, numMaj, nThickMin, nThickMaj) {
+  //creates minor and major tickmarks along a circle
+}
+
+var dashedCircle = function(rCirc, lDash, lGap, nThick) {
+  //creates dashing along the circle circumference
+  //optimizes lengths of dashes and gaps to evenly fit the circle
+  //if length to large for circle 4 dashes/gaps will be created based on prop dash/gaps
+
+  //find the best fitting dash/gap size
+  var cf = 2 * pi * rCirc
+  var lSeg = lGap + lDash
+  var numSegs = Math.max(4, Math.floor(cf / lSeg))
+  var angSeg = 2 * pi / numSegs
+  var angDash = angSeg * lDash / lSeg
+  var angGap = angSeg - angDash
+  alert("Dashed circle: " + numSegs + " recommended segments with dash/gap: " + angDash + "/" + angGap, "Dashed Circle")
+
+  var gr = doc.currentPage().addLayerOfType("group")
+  gr.setName("Dashed Circle")
+  for(var i = 0; i < numSegs; i++){
+    var path = NSBezierPath.bezierPath()
+
+    //build each of the segments
+    var aPts = computeLargeBezierArc(angSeg * i, (angSeg * i) + angDash, rCirc)
+    var nP = aPts.length //just in case curve needs to be split up into multiple segments for length
+    alert( "From: " + angSeg * i + " to: " + ((angSeg * i) + angDash) + "\n" + nP + " curve(s).", "Dashed circle" )
+    alert( aPts, "Dashed circle points array" )
+    for(var j = 0; j < nP; j++){
+      if(j == 0) {[path moveToPoint:NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1])]}
+      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
+    }
+    if (nThick > 1) {
+      //   var rIn = r - nThick
+      //   var aPt2 = computeLargeBezierArc(aSegs[i + 1], aSegs[i], rIn)
+      //   n2 = aPt2.length
+      //   //alert(aSegments[i] + ": " + (aSegs[i + 1]) + " to " + (aSegs[i]),"Calculating segment back")
+      //   for(var k = 0; k < n2; k++){
+      //     if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
+      //     [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
+      //   }
+      [path closePath] //only if we created an area
+    }
+
+    var shape = MSShapeGroup.shapeWithBezierPath(path);
+    styleShapeArea(shape)
+    shape.setName("Dash " + i)
+    gr.addLayers([shape])
+
+  }
+  placeLayer(gr)
+}
+
+
+//*********** util functions ***********//
 
 var computeBezierArc = function(angStart, angEnd, rSeg){
   //compute single segment with start and end angle and radius
