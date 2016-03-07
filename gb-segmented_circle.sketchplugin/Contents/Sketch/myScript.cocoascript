@@ -1,5 +1,5 @@
 
-var doc, pi, segs, idealsegs, r, thickness, pArray, def, scrollOrigin, zoomValue, sv
+var doc, pi, segs, idealsegs, thickness, pArray, def, scrollOrigin, zoomValue, sv
 
 var onRun = function(context) {
   // Global variables
@@ -30,76 +30,29 @@ var start = function(context){
     if(thickness){
         thickness = Math.min(thickness, r)
         [def setObject:(r + "," + segs + "," + thickness) forKey:key]//set defaults to this value
-        multiSegmentDonut(segs, thickness)
+        segmentCircle(r, segs, thickness)
     } else {
         [def setObject:(r + "," + segs) forKey:key]//set defaults to this value
-        multiSegmentCircle(segs)
+        segmentCircle(r, segs, 1)
     }
     //alert(computeBezierArc(pi/2, 0, 100), "arc test")//alert = function(sText, sTitle)
     //varSegmentCircle([50,30,20])
     //alert(preProcSeg([50,30,10,10]),"Preprocessed segments → anchor angles:")
-    //varSegmentDonut([40,30,20,10,5,2,1,0.5], 50)//debug
-    dashedCircle(100, 40, 20, 1)//debug
+    varSegmentCircle(100, [40,30,20,10,5,2,1,0.5], 1)//debug
+    //dashedCircle(100, 80, 40, 1)//debug
 }
 
-var multiSegmentCircle = function(numSegs){
+var segmentCircle = function(rCirc, numSegs, nThick){
   var angSeg = 2 * pi / numSegs
-  var path = NSBezierPath.bezierPath()
-
-  for(var i = 0; i < numSegs; i++){
-    var aPts = computeBezierArc(i * angSeg, (i+1) * angSeg, r)
-    //alert(aPts, "arc test")//alert = function(sText, sTitle)
-    if(i == 0) {path.moveToPoint(NSMakePoint(aPts.aBeg[0], aPts.aBeg[1]))}
-    [path curveToPoint:NSMakePoint(aPts.aEnd[0], aPts.aEnd[1]) controlPoint1:NSMakePoint(aPts.cPt1[0], aPts.cPt1[1]) controlPoint2:NSMakePoint(aPts.cPt2[0], aPts.cPt2[1])]
-  }
-
-  var shape = MSShapeGroup.shapeWithBezierPath(path);
-  shape.setName("Segments")
-  var gr = doc.currentPage().addLayerOfType("group")
-  //[gr setFrame:NSMakeRect(-r, -r, r*2, r*2)]
-  gr.setName("Segment circle (line)")
-  styleShape(shape)
-  gr.addLayers([shape])
-
-  placeLayer(gr)
-}
-
-var varSegmentCircle = function(aSegments){
-  var numSegs = aSegments.length
-  var aSegs = preProcSeg(aSegments)
-  //alert(aSegments + " → " + aSegs,"Test")
 
   var gr = doc.currentPage().addLayerOfType("group")
-  gr.setName("Variable segments circle")
-  for(var i = 0; i < numSegs; i++){
-    //build each of the segments
-    //alert("from " + aSegs[i] + " to " + aSegs[i + 1], "Segment being computed: #" + i)
-    var path = NSBezierPath.bezierPath()
-    var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], r)
-    for(var j = 0; j < aPts.length; j++){
-      if(j == 0) {path.moveToPoint(NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1]))}
-      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
-    }
-    var shape = MSShapeGroup.shapeWithBezierPath(path);
-    styleShape(shape)
-    shape.setName("Segment " + (aSegments[i]))
-    gr.addLayers([shape]);
-  }
-  placeLayer(gr)
-}
+  gr.setName("Segments Circle")
 
-var varSegmentDonut = function(aSegments, nThick){
-  var numSegs = aSegments.length
-  var aSegs = preProcSeg(aSegments)
-  //alert(aSegments + " → " + aSegs,"Test")
-
-  var gr = doc.currentPage().addLayerOfType("group")
-  gr.setName("Variable segments donut")
   for(var i = 0; i < numSegs; i++){
     var path = NSBezierPath.bezierPath()
     //build each of the segments
 
-    var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], r)
+    var aPts = computeLargeBezierArc(angSeg * i, angSeg * (i + 1), rCirc)
     var nP = aPts.length
     //alert(aSegments[i] + ": " + (aSegs[i]) + " to " + (aSegs[i + 1]),"Calculating segment out")
     for(var j = 0; j < nP; j++){
@@ -107,64 +60,59 @@ var varSegmentDonut = function(aSegments, nThick){
       [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
     }
 
-    var rIn = r - nThick
-    var aPt2 = computeLargeBezierArc(aSegs[i + 1], aSegs[i], rIn)
-    n2 = aPt2.length
-    //alert(aSegments[i] + ": " + (aSegs[i + 1]) + " to " + (aSegs[i]),"Calculating segment back")
-    for(var k = 0; k < n2; k++){
-      if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
-      [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
+    if (nThick > 1) {
+      var rIn = rCirc - nThick
+      var aPt2 = computeLargeBezierArc(angSeg * (i + 1), angSeg * i, rIn)
+      n2 = aPt2.length
+      for(var k = 0; k < n2; k++){
+        if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
+        [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
+      }
+      [path closePath]
     }
 
-    [path closePath]
     var shape = MSShapeGroup.shapeWithBezierPath(path);
-    styleShapeArea(shape)
-    shape.setName("Segment " + (aSegments[i]))
+    if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    shape.setName("Segment " + i)
     gr.addLayers([shape]);
   }
   placeLayer(gr)
 }
 
-var multiSegmentDonut = function(numSegs, nThick){
-    //compute ideal cp handle length
-	pArray = []
-    var rI = r - nThick
-    var lSeg = 2 * pi / numSegs
-    var lCpHandle = r * 4 / 3 * (Math.tan(pi / (2 * numSegs)))
-    var lCpHandleI = rI * 4 / 3 * (Math.tan(pi / (2 * numSegs)))
-    //alert("length of cp handle is " + lCpHandle, "Test")
-    for(var i = -1; i <= numSegs; i++){
-    	var aGeomFactor = 	[Math.cos(lSeg * i - pi/2), Math.sin(lSeg * i - pi/2)]
-      if(i == 0){alert("GFact1 is " + aGeomFactor, "Test")}//test
-    	var pAnchor = 		[rd2dec(aGeomFactor[0] * r), rd2dec(aGeomFactor[1] * r)]
-    var pAnchorI =      [rd2dec(aGeomFactor[0] * rI), rd2dec(aGeomFactor[1] * rI)]
-    	var pLe =			[pAnchor[0] - rd2dec(aGeomFactor[1] * lCpHandle), pAnchor[1] + rd2dec(aGeomFactor[0] * lCpHandle)]
-    	var pRi =			[pAnchor[0] + rd2dec(aGeomFactor[1] * lCpHandle), pAnchor[1] - rd2dec(aGeomFactor[0] * lCpHandle)]
-    var pLeI =			[pAnchorI[0] - rd2dec(aGeomFactor[1] * lCpHandleI), pAnchorI[1] + rd2dec(aGeomFactor[0] * lCpHandleI)]
-    	var pRiI =			[pAnchorI[0] + rd2dec(aGeomFactor[1] * lCpHandleI), pAnchorI[1] - rd2dec(aGeomFactor[0] * lCpHandleI)]
-    	pArray.push({anchor:pAnchor, left:pLe, right:pRi, anchorI:pAnchorI, leftI:pLeI, rightI:pRiI})
+var varSegmentCircle = function(rCirc, aSegments, nThick){
+  var numSegs = aSegments.length
+  var aSegs = preProcSeg(aSegments)
+
+  var gr = doc.currentPage().addLayerOfType("group")
+  gr.setName("Variable segments donut")
+  for(var i = 0; i < numSegs; i++){
+    var path = NSBezierPath.bezierPath()
+    //build each of the segments
+
+    var aPts = computeLargeBezierArc(aSegs[i], aSegs[i + 1], rCirc)
+    var nP = aPts.length
+    //alert(aSegments[i] + ": " + (aSegs[i]) + " to " + (aSegs[i + 1]),"Calculating segment out")
+    for(var j = 0; j < nP; j++){
+      if(j == 0) {[path moveToPoint:NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1])]}
+      [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
     }
 
-	  var gr = doc.currentPage().addLayerOfType("group")
-    gr.setName("Segment circle")
+    if (nThick > 1) {
+      var rIn = rCirc - nThick
+      var aPt2 = computeLargeBezierArc(aSegs[i + 1], aSegs[i], rIn)
+      n2 = aPt2.length
+      for(var k = 0; k < n2; k++){
+        if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
+        [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
+      }
+      [path closePath]
+    }
 
-    for(var j = 0; j < numSegs; j++){
-        var i = j + 1
-		    var path = NSBezierPath.bezierPath();
-        [path moveToPoint:NSMakePoint(pArray[i].anchor[0], pArray[i].anchor[1])];
-    		[path curveToPoint:NSMakePoint(pArray[i+1].anchor[0], pArray[i+1].anchor[1]) controlPoint1:NSMakePoint(pArray[i].left[0], pArray[i].left[1]) controlPoint2:NSMakePoint(pArray[i+1].right[0], pArray[i+1].right[1])]
-        [path lineToPoint:NSMakePoint(pArray[i+1].anchorI[0], pArray[i+1].anchorI[1])];
-        [path curveToPoint:NSMakePoint(pArray[i].anchorI[0], pArray[i].anchorI[1]) controlPoint1:NSMakePoint(pArray[i+1].rightI[0], pArray[i+1].rightI[1]) controlPoint2:NSMakePoint(pArray[i].leftI[0], pArray[i].leftI[1])]
-        [path lineToPoint:NSMakePoint(pArray[i].anchor[0], pArray[i].anchor[1])];
-        [path closePath]
-
-        var shape = MSShapeGroup.shapeWithBezierPath(path);
-        styleShape(shape)
-        shape.setName("Segment " + i)
-        //add to group
-        gr.addLayers([shape]);
-	}
-
+    var shape = MSShapeGroup.shapeWithBezierPath(path);
+    if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    shape.setName("Segment " + (aSegments[i]))
+    gr.addLayers([shape]);
+  }
   placeLayer(gr)
 }
 
@@ -174,17 +122,13 @@ var ticksCircle = function(rCirc, numMin, numMaj, nThickMin, nThickMaj) {
 
 var dashedCircle = function(rCirc, lDash, lGap, nThick) {
   //creates dashing along the circle circumference
-  //optimizes lengths of dashes and gaps to evenly fit the circle
-  //if length to large for circle 4 dashes/gaps will be created based on prop dash/gaps
-
-  //find the best fitting dash/gap size
+  //optmize dash/gap size for even dashes
   var cf = 2 * pi * rCirc
   var lSeg = lGap + lDash
   var numSegs = Math.max(4, Math.floor(cf / lSeg))
   var angSeg = 2 * pi / numSegs
   var angDash = angSeg * lDash / lSeg
   var angGap = angSeg - angDash
-  alert("Dashed circle: " + numSegs + " recommended segments with dash/gap: " + angDash + "/" + angGap, "Dashed Circle")
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Dashed Circle")
@@ -194,26 +138,23 @@ var dashedCircle = function(rCirc, lDash, lGap, nThick) {
     //build each of the segments
     var aPts = computeLargeBezierArc(angSeg * i, (angSeg * i) + angDash, rCirc)
     var nP = aPts.length //just in case curve needs to be split up into multiple segments for length
-    alert( "From: " + angSeg * i + " to: " + ((angSeg * i) + angDash) + "\n" + nP + " curve(s).", "Dashed circle" )
-    alert( aPts, "Dashed circle points array" )
     for(var j = 0; j < nP; j++){
       if(j == 0) {[path moveToPoint:NSMakePoint(aPts[0].aBeg[0], aPts[0].aBeg[1])]}
       [path curveToPoint:NSMakePoint(aPts[j].aEnd[0], aPts[j].aEnd[1]) controlPoint1:NSMakePoint(aPts[j].cPt1[0], aPts[j].cPt1[1]) controlPoint2:NSMakePoint(aPts[j].cPt2[0], aPts[j].cPt2[1])]
     }
     if (nThick > 1) {
-      //   var rIn = r - nThick
-      //   var aPt2 = computeLargeBezierArc(aSegs[i + 1], aSegs[i], rIn)
-      //   n2 = aPt2.length
-      //   //alert(aSegments[i] + ": " + (aSegs[i + 1]) + " to " + (aSegs[i]),"Calculating segment back")
-      //   for(var k = 0; k < n2; k++){
-      //     if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
-      //     [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
-      //   }
-      [path closePath] //only if we created an area
+        var rIn = r - nThick
+        var aPt2 = computeLargeBezierArc((angSeg * i) + angDash, angSeg * i, rIn)
+        n2 = aPt2.length
+        for(var k = 0; k < n2; k++){
+          if(k == 0) {[path lineToPoint:NSMakePoint(aPt2[0].aBeg[0], aPt2[0].aBeg[1])]}
+          [path curveToPoint:NSMakePoint(aPt2[k].aEnd[0], aPt2[k].aEnd[1]) controlPoint1:NSMakePoint(aPt2[k].cPt1[0], aPt2[k].cPt1[1]) controlPoint2:NSMakePoint(aPt2[k].cPt2[0], aPt2[k].cPt2[1])]
+        }
+      [path closePath]
     }
 
     var shape = MSShapeGroup.shapeWithBezierPath(path);
-    styleShapeArea(shape)
+    if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
     shape.setName("Dash " + i)
     gr.addLayers([shape])
 
