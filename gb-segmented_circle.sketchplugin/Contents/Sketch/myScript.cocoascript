@@ -36,14 +36,16 @@ var start = function(context){
     //alert(computeBezierArc(pi/2, 0, 100), "arc test")//alert = function(sText, sTitle)
     //varSegmentCircle([50,30,20])
     //alert(preProcSeg([50,30,10,10]),"Preprocessed segments → anchor angles:")
-    varSegmentCircle(100, [40,30,20,10,5,2,1,0.5], 1)//debug
-    dashedCircle(100, 80, 40, 1)//debug
+    //varSegmentCircle(100, [40,30,20,10,5,2,1,0.5], 1)//debug
+    //dashedCircle(100, 80, 40, 1)//debug
+    ticksCircle(84, 100, 4, 8, 4, 4, 4, 20, pi/2)//debug
 }
 
 var segmentCircle = function(rCirc, numSegs, nThick){
-  var angSeg = 2 * pi / numSegs
   var gr = doc.currentPage().addLayerOfType("group")
-  gr.setName("Segments Circle")
+  gr.setName("Segments circle")
+
+  var angSeg = 2 * pi / numSegs
 
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(angSeg * i , angSeg * (i + 1), rCirc, nThick)
@@ -69,8 +71,42 @@ var varSegmentCircle = function(rCirc, aSegments, nThick){
   placeLayer(gr)
 }
 
-var ticksCircle = function(rCirc, numMin, numMaj, nThickMin, nThickMaj) {
-  //creates minor and major tickmarks along a circle
+var ticksCircle = function(rOutMin, rOutMaj, numMin, numMaj, nStrkMin, nStrkMaj, nThickMin, nThickMaj, angOmit) {
+  //creates minor and major tickmarks along a circle minus the cutout angOmit
+  var gr = doc.currentPage().addLayerOfType("group")
+  gr.setName("Tickmarks circle")
+  var grMaj = gr.addLayerOfType("group")
+  grMaj.setName("Major tickmarks")
+  if (numMin > 0){
+    var grMin = gr.addLayerOfType("group")
+    grMin.setName("Minor tickmarks")
+  }
+
+  var angRange = 2 * pi - angOmit
+  //alert(angRange,"Range:")
+  var cf = angRange * rOutMaj
+  var angPx = angRange / Math.round(cf)
+  var angDistTick = angRange / ((numMaj - 1) * (numMin + 1))
+  var angCor = (angOmit > 0) ? angOmit / 2 + pi / 2 : 0
+  for(var i = 0; i < numMaj; i++){
+    var a = (i * (numMin + 1)) * angDistTick - angCor
+    var shape = makeArcSeg(a - ((nStrkMaj/2) * angPx) , a + ((nStrkMaj/2) * angPx), rOutMaj, nThickMaj)
+    if (nThickMaj > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    shape.setName("Tick major " + (i * (numMin + 1)))
+    grMaj.addLayers([shape]);
+
+    if(numMin >= 1 && (i < (numMaj - 1))){
+      var ub = (i == (numMaj - 2)) ? numMin + 2 : numMin + 1 // last minor tick under the last major one
+      for(var j = 0; j < ub; j++){
+        var a = ((i * (numMin + 1)) + j) * angDistTick - angCor
+        var shape = makeArcSeg(a - ((nStrkMin/2) * angPx) , a + ((nStrkMin/2) * angPx), rOutMin, nThickMin)
+        if (nThickMin > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+        shape.setName("Tick minor " + (((i * (numMin + 1)) + j) + 0))
+        grMin.addLayers([shape]);
+      }
+    }
+  }
+  placeLayer(gr)
 }
 
 var dashedCircle = function(rCirc, lDash, lGap, nThick) {
@@ -84,7 +120,7 @@ var dashedCircle = function(rCirc, lDash, lGap, nThick) {
   var angGap = angSeg - angDash
 
   var gr = doc.currentPage().addLayerOfType("group")
-  gr.setName("Dashed Circle")
+  gr.setName("Dashed circle")
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(angSeg * i, (angSeg * i) + angDash, rCirc, nThick)
     if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
@@ -194,9 +230,9 @@ var styleShape = function(shapeGr){
 var styleShapeArea = function(shapeGr){
     var fill = shapeGr.style().fills().addNewStylePart();
     fill.color = MSColor.colorWithSVGString("#cccccc");
-    var border = shapeGr.style().borders().addNewStylePart();
-    border.color = MSColor.colorWithSVGString("#f0f0f0");
-    border.thickness = 1;
+    //var border = shapeGr.style().borders().addNewStylePart();
+    //border.color = MSColor.colorWithSVGString("#f0f0f0");
+    //border.thickness = 1;
     //border.position = 1;
 }
 
