@@ -1,4 +1,3 @@
-
 var doc, pi, segs, idealsegs, thickness, pArray, def, scrollOrigin, zoomValue, sv
 
 var onRun = function(context) {
@@ -16,40 +15,38 @@ var onRun = function(context) {
 }
 
 var start = function(context){
-    alert("starting app", "Test")
-    var key = "gb_segCircle"
-    var sc = [def objectForKey:key]
-    if(sc == nil) {sc = r + "," + segs + "," + thickness} //retrieve value from defaults, if none set
-    var sInput = [doc askForUserInput:"radius , number of segments , [thickness]" + "\n" + "(Leave Thickness empty to create unfilled line segments)" initialValue:sc]
-    r =     parseInt(sInput.split(",")[0])
-    segs =  parseInt(sInput.split(",")[1])
+    var key = "gb_segCircle_segm" //retrieve value from defaults, if none set
+    var sc = [def objectForKey:key] || [{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}]
+    alert("starting app: " + sc, "Defaults")
+    var inp = showDlg(
+      "Segment Circle",
+      "Input radius, number of segments and thickness (optional). \nIf Thickness is < 2 or left out → rendered as line segments.",
+      [{label: "Outer radius", data:sc[0].data}, {label: "Number of segments", data:sc[1].data}, {label: "Thickness", data:sc[2].data}],
+      "Create Circle")
+    // initialValue:sc]
+    r =     parseInt(inp[0])
+    segs =  parseInt(inp[1])
     segs =  Math.max(Math.round(segs),3)
-    thickness = parseInt(sInput.split(",")[2])
-    if(thickness){
-        thickness = Math.min(thickness, r)
-        [def setObject:(r + "," + segs + "," + thickness) forKey:key]//set defaults to this value
-        segmentCircle(r, segs, thickness)
-    } else {
-        [def setObject:(r + "," + segs) forKey:key]//set defaults to this value
-        segmentCircle(r, segs, 1)
-    }
-    //alert(computeBezierArc(pi/2, 0, 100), "arc test")//alert = function(sText, sTitle)
+    thickness = Math.min(parseInt(inp[2]),r)
+    [def setObject:[{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}] forKey:key]
+    segmentCircle(r, segs, thickness)
+
     //varSegmentCircle([50,30,20])
-    //alert(preProcSeg([50,30,10,10]),"Preprocessed segments → anchor angles:")
-    //varSegmentCircle(100, [40,30,20,10,5,2,1,0.5], 1)//debug
+    varSegmentCircle(100, [40,30,20,10,5,2,1,0.5], 40)//debug
     //dashedCircle(100, 80, 40, 1)//debug
-    ticksCircle(84, 100, 4, 8, 4, 4, 4, 20, pi/2)//debug
+    //ticksCircle(84, 100, 4, 8, 4, 4, 4, 20, pi/2)//debug
 }
 
 var segmentCircle = function(rCirc, numSegs, nThick){
   var gr = doc.currentPage().addLayerOfType("group")
+  var c = getRnCol()
   gr.setName("Segments circle")
 
   var angSeg = 2 * pi / numSegs
 
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(angSeg * i , angSeg * (i + 1), rCirc, nThick)
-    if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    if (nThick > 1) {styleShapeArea(shape, c)} else {styleShape(shape, c)}
     shape.setName("Segment " + (i + 1))
     gr.addLayers([shape]);
   }
@@ -64,7 +61,7 @@ var varSegmentCircle = function(rCirc, aSegments, nThick){
   gr.setName("Variable segments circle")
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(aSegs[i], aSegs[i + 1], rCirc, nThick)
-    if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    if (nThick > 1) {styleShapeArea(shape,getRnCol())} else {styleShape(shape,getRnCol())}
     shape.setName("Segment " + (aSegments[i]))
     gr.addLayers([shape]);
   }
@@ -74,6 +71,8 @@ var varSegmentCircle = function(rCirc, aSegments, nThick){
 var ticksCircle = function(rOutMin, rOutMaj, numMin, numMaj, nStrkMin, nStrkMaj, nThickMin, nThickMaj, angOmit) {
   //creates minor and major tickmarks along a circle minus the cutout angOmit
   var gr = doc.currentPage().addLayerOfType("group")
+  var c1 = getRnCol()
+  var c2 = getRnCol()
   gr.setName("Tickmarks circle")
   var grMaj = gr.addLayerOfType("group")
   grMaj.setName("Major tickmarks")
@@ -91,7 +90,7 @@ var ticksCircle = function(rOutMin, rOutMaj, numMin, numMaj, nStrkMin, nStrkMaj,
   for(var i = 0; i < numMaj; i++){
     var a = (i * (numMin + 1)) * angDistTick - angCor
     var shape = makeArcSeg(a - ((nStrkMaj/2) * angPx) , a + ((nStrkMaj/2) * angPx), rOutMaj, nThickMaj)
-    if (nThickMaj > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    if (nThickMaj > 1) {styleShapeArea(shape,c1)} else {styleShape(shape,c1)}
     shape.setName("Tick major " + (i * (numMin + 1)))
     grMaj.addLayers([shape]);
 
@@ -100,7 +99,7 @@ var ticksCircle = function(rOutMin, rOutMaj, numMin, numMaj, nStrkMin, nStrkMaj,
       for(var j = 0; j < ub; j++){
         var a = ((i * (numMin + 1)) + j) * angDistTick - angCor
         var shape = makeArcSeg(a - ((nStrkMin/2) * angPx) , a + ((nStrkMin/2) * angPx), rOutMin, nThickMin)
-        if (nThickMin > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+        if (nThickMin > 1) {styleShapeArea(shape,c2)} else {styleShape(shape,c2)}
         shape.setName("Tick minor " + (((i * (numMin + 1)) + j) + 0))
         grMin.addLayers([shape]);
       }
@@ -121,9 +120,10 @@ var dashedCircle = function(rCirc, lDash, lGap, nThick) {
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Dashed circle")
+  var c = getRnCol()
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(angSeg * i, (angSeg * i) + angDash, rCirc, nThick)
-    if (nThick > 1) {styleShapeArea(shape)} else {styleShape(shape)}
+    if (nThick > 1) {styleShapeArea(shape, c)} else {styleShape(shape, c)}
     shape.setName("Dash " + i)
     gr.addLayers([shape])
 
@@ -220,16 +220,16 @@ var getViewF = function(){
     return [view frame];
 }
 
-var styleShape = function(shapeGr){
+var styleShape = function(shapeGr, sC){
     var border = shapeGr.style().borders().addNewStylePart();
-    border.color = MSColor.colorWithSVGString("#000066");
+    border.color = MSColor.colorWithSVGString(sC);
     border.thickness = 2;
     //border.position = 1;
 }
 
-var styleShapeArea = function(shapeGr){
+var styleShapeArea = function(shapeGr, sC){
     var fill = shapeGr.style().fills().addNewStylePart();
-    fill.color = MSColor.colorWithSVGString("#cccccc");
+    fill.color = MSColor.colorWithSVGString(sC);
     //var border = shapeGr.style().borders().addNewStylePart();
     //border.color = MSColor.colorWithSVGString("#f0f0f0");
     //border.thickness = 1;
@@ -251,6 +251,32 @@ var placeLayer = function(lyr){
     } else {
       lyr.resizeToFitChildrenWithOption(0)
     }
+}
+
+var getRnCol = function(){
+  var aCols = ["#B71C1C","#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#0288D1","#00bcd4","#00bcd4","#4caf50","#8bc34a","#cddc39","#F9A825","#FF8F00","#F57C00","#D84315","#795548","#9e9e9e","#607d8b"]
+  var lA = aCols.length
+  return aCols[Math.floor(Math.random() * aCols.length)]
+}
+
+var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
+  var dlg = COSAlertWindow.new();
+	dlg.setMessageText(sMsg || "Plugin dialog");
+	dlg.setInformativeText(sInfo || "To run this plugin more data will be needed");
+  for(var i = 0; i < aFields.length; i++){
+    dlg.addTextLabelWithValue(aFields[i].label || ("Field " + i));
+  	dlg.addTextFieldWithValue(aFields[i].data  || ("Data " + i));
+  }
+	dlg.addButtonWithTitle( sBtnGoText || 'OK');
+	dlg.addButtonWithTitle('Cancel');
+
+  var aResults = []
+	if(dlg.runModal() == 1000) {
+    for(var i = 1; i < aFields.length * 2; i+=2) {
+      aResults.push(dlg.viewAtIndex(i).stringValue()) //only every other, we don't care about labels
+    }
+  }
+  return aResults
 }
 
 var getSkVer = function() {
