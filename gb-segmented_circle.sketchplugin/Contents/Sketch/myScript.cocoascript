@@ -86,9 +86,10 @@ var varSegmentCircle = function(rCirc, aSegments, nThick){
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Variable segments circle")
+  var aUsedCols = []
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(aSegs[i], aSegs[i + 1], rCirc, nThick)
-    if (nThick > 1) {styleShapeArea(shape,getRnCol())} else {styleShape(shape,getRnCol())}
+    if (nThick > 1) {styleShapeArea(shape,getRnCol(aUsedCols))} else {styleShape(shape,getRnCol(aUsedCols))}
     shape.setName("Segment " + (aSegments[i]))
     gr.addLayers([shape]);
   }
@@ -233,7 +234,6 @@ var preProcSeg = function(aSegments){
   var factor = 2 * pi / total
   for (i=1; i<=n; i++) {aSegs.push(aSegs[i-1] + (parseInt(aSegments[i-1]) * factor))}
   aSegs[aSegs.length - 1] = 2 * pi
-  alert(dbgArray(aSegs),"segments done processing")
   return aSegs
 }
 
@@ -280,10 +280,18 @@ var placeLayer = function(lyr){
     }
 }
 
-var getRnCol = function(){
+var getRnCol = function(aUsedSoFar){
   var aCols = ["#B71C1C","#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#0288D1","#00bcd4","#00bcd4","#4caf50","#8bc34a","#cddc39","#F9A825","#FF8F00","#F57C00","#D84315","#795548","#9e9e9e","#607d8b"]
-  var lA = aCols.length
-  return aCols[Math.floor(Math.random() * aCols.length)]
+  var c
+  if(aUsedSoFar){
+    do {
+  		c = aCols[Math.floor(Math.random() * aCols.length)]
+  	} while(aUsedSoFar.indexOf(c) != -1)
+    aUsedSoFar.push(c)
+  } else {
+    c = aCols[Math.floor(Math.random() * aCols.length)]
+  }
+  return c
 }
 
 var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
