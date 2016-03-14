@@ -1,4 +1,4 @@
-var doc, pi, segs, idealsegs, thickness, pArray, def, scrollOrigin, zoomValue, sv
+var doc, pi, r, segs, idealsegs, vals, thickness, pArray, def, sv
 
 var onRun = function(context) {
   // Global variables
@@ -6,33 +6,60 @@ var onRun = function(context) {
   pi = Math.PI
   r = 100
   segs = idealsegs = 6
+  vals = "40,30,20,10,5"
   thickness = 20
   pArray = []
   def = [NSUserDefaults standardUserDefaults]
   sv = getSkVer()
   //actual functions
-  start(context)
+  start()
 }
 
-var start = function(context){
-    var key = "gb_segCircle_segm" //retrieve value from defaults, if none set
-    var sc = [def objectForKey:key] || [{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}]
-    alert("starting app: " + sc, "Defaults")
-    var inp = showDlg(
-      "Segment Circle",
-      "Input radius, number of segments and thickness (optional). \nIf Thickness is < 2 or left out → rendered as line segments.",
-      [{label: "Outer radius", data:sc[0].data}, {label: "Number of segments", data:sc[1].data}, {label: "Thickness", data:sc[2].data}],
-      "Create Circle")
-    // initialValue:sc]
-    r =     parseInt(inp[0])
-    segs =  parseInt(inp[1])
-    segs =  Math.max(Math.round(segs),3)
-    thickness = Math.min(parseInt(inp[2]),r)
-    [def setObject:[{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}] forKey:key]
-    segmentCircle(r, segs, thickness)
+var start = function(){
+    var whichOne = "var"//switch case which type of segmented circles
+    switch (whichOne) {
+
+      case "var":
+        var key = "gb_segCircle_var" //retrieve value from defaults, if none set
+        var sc = JSON.parse([def objectForKey:key]) || {el:[{label: "Outer radius", data:r}, {label: "Values", data:vals}, {label: "Thickness", data:thickness}]}
+        var inp = showDlg(
+          "Variable Segments Circle",
+          "Input radius, values and thickness. \n\nValues are a comma seperated list of numbers.",
+          sc.el,
+          "Create Circle")
+        sc.el[0].data = parseInt(inp[0])
+        sc.el[1].data = inp[1].split(",").join(",") //not sure why it only works this way
+        sc.el[2].data = parseInt(inp[2])
+        [def setObject:JSON.stringify(sc) forKey:key]
+        varSegmentCircle(sc.el[0].data, sc.el[1].data.split(","), sc.el[2].data)
+      break;
+
+      case "ticks":
+      //Statements executed when the result of expression matches value1
+      break;
+
+      case "dashes":
+      //Statements executed when the result of expression matches value1
+      break;
+
+      default:
+        var key = "gb_segCircle_segm" //retrieve value from defaults, if none set
+        var sc = [def objectForKey:key] || [{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}]
+        var inp = showDlg(
+          "Segment Circle",
+          "Input radius, number of segments and thickness. \n\nThickness < 2 → circle is rendered as line segments.",
+          [{label: "Outer radius", data:sc[0].data}, {label: "Number of segments", data:sc[1].data}, {label: "Thickness", data:sc[2].data}],
+          "Create Circle")
+        // initialValue:sc]
+        r =         parseInt(inp[0])
+        segs =      Math.max(Math.round(parseInt(inp[1])),3)
+        thickness = Math.min(parseInt(inp[2]) || 1,r)
+        [def setObject:[{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}] forKey:key]
+        segmentCircle(r, segs, thickness)
+    }
 
     //varSegmentCircle([50,30,20])
-    varSegmentCircle(100, [40,30,20,10,5,2,1,0.5], 40)//debug
+    //varSegmentCircle(100, [40,30,20,10,5], 24)//debug
     //dashedCircle(100, 80, 40, 1)//debug
     //ticksCircle(84, 100, 4, 8, 4, 4, 4, 20, pi/2)//debug
 }
@@ -197,15 +224,16 @@ var rd2dec = function(num) {
 }
 
 var preProcSeg = function(aSegments){
-  //normalize to 6.28
+  //normalize list arbitrary string numbers as distr. of a total of 2 * pi
   var aSegs = [0]
   var total = 0;
   var n = aSegments.length;
   var i = n;
-  while (i--) {total += aSegments[i]}
+  while (i--) {total += parseInt(aSegments[i])}
   var factor = 2 * pi / total
-  for (i=1; i<=n; i++) {aSegs.push(aSegs[i-1] + (aSegments[i-1] * factor))}
-  aSegs[aSegs.length - 1] = 6.28
+  for (i=1; i<=n; i++) {aSegs.push(aSegs[i-1] + (parseInt(aSegments[i-1]) * factor))}
+  aSegs[aSegs.length - 1] = 2 * pi
+  alert(dbgArray(aSegs),"segments done processing")
   return aSegs
 }
 
@@ -224,16 +252,15 @@ var styleShape = function(shapeGr, sC){
     var border = shapeGr.style().borders().addNewStylePart();
     border.color = MSColor.colorWithSVGString(sC);
     border.thickness = 2;
-    //border.position = 1;
 }
 
 var styleShapeArea = function(shapeGr, sC){
     var fill = shapeGr.style().fills().addNewStylePart();
     fill.color = MSColor.colorWithSVGString(sC);
-    //var border = shapeGr.style().borders().addNewStylePart();
-    //border.color = MSColor.colorWithSVGString("#f0f0f0");
-    //border.thickness = 1;
-    //border.position = 1;
+    var border = shapeGr.style().borders().addNewStylePart();
+    border.color = MSColor.colorWithSVGString("#ffffff");
+    border.thickness = .5;
+    border.position = 1;
 }
 
 var placeLayer = function(lyr){
@@ -264,8 +291,8 @@ var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
 	dlg.setMessageText(sMsg || "Plugin dialog");
 	dlg.setInformativeText(sInfo || "To run this plugin more data will be needed");
   for(var i = 0; i < aFields.length; i++){
-    dlg.addTextLabelWithValue(aFields[i].label || ("Field " + i));
-  	dlg.addTextFieldWithValue(aFields[i].data  || ("Data " + i));
+    dlg.addTextLabelWithValue(aFields[i].label.toString() || ("Field " + i));
+  	dlg.addTextFieldWithValue(aFields[i].data.toString()  || ("Data " + i));
   }
 	dlg.addButtonWithTitle( sBtnGoText || 'OK');
 	dlg.addButtonWithTitle('Cancel');
@@ -273,9 +300,10 @@ var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
   var aResults = []
 	if(dlg.runModal() == 1000) {
     for(var i = 1; i < aFields.length * 2; i+=2) {
-      aResults.push(dlg.viewAtIndex(i).stringValue()) //only every other, we don't care about labels
+      aResults.push(dlg.viewAtIndex(i).stringValue().toString()) //only every other, we don't care about labels
     }
   }
+  //alert(aResults,"Returning this array from dialog:")
   return aResults
 }
 
@@ -286,4 +314,29 @@ var getSkVer = function() {
 		v2 = v2 + "0"
 	} while(v2.length <= 4)
 	return (Number(v2) + 0)
+}
+
+function dbgArray(arr,level) {
+  var dumped_text = "";
+  if(!level) level = 0;
+
+  //The padding given at the beginning of the line.
+  var level_padding = "";
+  for(var j=0;j<level+1;j++) level_padding += "    ";
+
+  if(typeof(arr) == 'object') { //Array/Hashes/Objects
+      for(var item in arr) {
+          var value = arr[item];
+
+          if(typeof(value) == 'object') { //If it is an array,
+              dumped_text += level_padding + "'" + item + "' ...\n";
+              dumped_text += dbgArray(value,level+1);
+          } else {
+              dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+          }
+      }
+  } else { //Stings/Chars/Numbers etc.
+      dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+  }
+  return dumped_text;
 }
