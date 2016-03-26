@@ -1,13 +1,21 @@
-var doc, pi, r, segs, idealsegs, vals, thickness, pArray, def, sv
+var doc, pi, pArray, def, sv
+var r, segs, idealsegs, vals, thickness, omit, stMaj, stMin, nMaj, nMin
 
 var onRun = function(context) {
   // Global variables
   doc = context.document
   pi = Math.PI
+
   r = 100
   segs = idealsegs = 6
   vals = "40,30,20,10,5"
   thickness = 20
+  omit = 0
+  stMaj = 6
+  stMin = 2
+  nMaj = 12
+  nMin = 4
+
   pArray = []
   def = [NSUserDefaults standardUserDefaults]
   sv = getSkVer()
@@ -21,7 +29,12 @@ var start = function(){
 
       case "var":
         var key = "gb_segCircle_var" //retrieve value from defaults, if none set
-        var sc = JSON.parse([def objectForKey:key]) || {el:[{label: "Outer radius", data:r}, {label: "Values", data:vals}, {label: "Thickness", data:thickness}]}
+        var sc = JSON.parse([def objectForKey:key]) || {el:[
+                                                            {label: "Outer radius", data:r},
+                                                            {label: "Values", data:vals},
+                                                            {label: "Thickness", data:thickness},
+                                                            {label: "Bottom cutout angle", data: omit}
+                                                        ]}
         var inp = showDlg(
           "Variable Segments Circle",
           "Input radius, values and thickness. \n\nValues are a comma seperated list of numbers.",
@@ -30,49 +43,101 @@ var start = function(){
         sc.el[0].data = parseInt(inp[0])
         sc.el[1].data = inp[1].split(",").join(",") //not sure why it only works this way
         sc.el[2].data = parseInt(inp[2])
+        sc.el[3].data = parseInt(inp[3])
         [def setObject:JSON.stringify(sc) forKey:key]
-        varSegmentCircle(sc.el[0].data, sc.el[1].data.split(","), sc.el[2].data)
+        varSegmentCircle(sc.el[0].data, sc.el[1].data.split(","), sc.el[2].data, deg2rdns(sc.el[3].data))
       break;
 
       case "ticks":
-      //Statements executed when the result of expression matches value1
+        var key = "gb_segCircle_tix" //retrieve value from defaults, if none set
+        var sc = JSON.parse([def objectForKey:key]) || {el:[
+                                                            {label: "Outer radius major ticks", data: r},
+                                                            {label: "Outer radius minor ticks", data: r},
+                                                            {label: "Major ticks", data: nMaj},
+                                                            {label: "Minor ticks in between", data: nMin},
+                                                            {label: "Major ticks stroke", data: stMaj},
+                                                            {label: "Minor ticks stroke", data: stMin},
+                                                            {label: "Major ticks length", data: thickness},
+                                                            {label: "Minor ticks length", data: thickness},
+                                                            {label: "Bottom cutout angle", data: omit}
+                                                        ]}
+        var inp = showDlg(
+          "Ticks Circle",
+          "Input values for major and minor ticks.",
+          sc.el,
+          "Create Circle")
+        sc.el[0].data = parseInt(inp[0])
+        sc.el[1].data = parseInt(inp[1])
+        sc.el[2].data = parseInt(inp[2])
+        sc.el[3].data = parseInt(inp[3])
+        sc.el[4].data = parseInt(inp[4])
+        sc.el[5].data = parseInt(inp[5])
+        sc.el[6].data = parseInt(inp[6])
+        sc.el[7].data = parseInt(inp[7])
+        sc.el[8].data = parseInt(inp[8])
+        [def setObject:JSON.stringify(sc) forKey:key]
+        ticksCircle(sc.el[0].data, sc.el[1].data, sc.el[2].data, sc.el[3].data, sc.el[4].data, sc.el[5].data, sc.el[6].data, sc.el[7].data, deg2rdns(sc.el[8].data))
       break;
 
       case "dashes":
-      //Statements executed when the result of expression matches value1
+        var key = "gb_segCircle_dsh" //retrieve value from defaults, if none set
+        var sc = JSON.parse([def objectForKey:key]) || {el:[
+                                                            {label: "Outer radius", data: r},
+                                                            {label: "Length of dashes", data: stMaj},
+                                                            {label: "Length of gaps", data: stMin},
+                                                            {label: "Thickness", data: thickness}
+                                                        ]}
+        var inp = showDlg(
+          "Circle with dashes",
+          "Input values for outer radius, lengths of dashes and gaps and thickness.",
+          sc.el,
+          "Create Circle")
+        sc.el[0].data = parseInt(inp[0])
+        sc.el[1].data = parseInt(inp[1])
+        sc.el[2].data = parseInt(inp[2])
+        sc.el[3].data = parseInt(inp[3])
+        [def setObject:JSON.stringify(sc) forKey:key]
+        dashedCircle(sc.el[0].data, sc.el[1].data, sc.el[2].data, sc.el[3].data)
       break;
 
       default:
-        var key = "gb_segCircle_segm" //retrieve value from defaults, if none set
-        var sc = [def objectForKey:key] || [{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}]
+        var key = "gb_segCircle_seg" //retrieve value from defaults, if none set
+        var sc = JSON.parse([def objectForKey:key]) || {el:[
+                                                            {label: "Outer radius", data: r},
+                                                            {label: "Number of segments", data: segs},
+                                                            {label: "Thickness", data: thickness},
+                                                            {label: "Bottom cutout angle", data: omit}
+                                                        ]}
         var inp = showDlg(
-          "Segment Circle",
-          "Input radius, number of segments and thickness. \n\nThickness < 2 → circle is rendered as line segments.",
-          [{label: "Outer radius", data:sc[0].data}, {label: "Number of segments", data:sc[1].data}, {label: "Thickness", data:sc[2].data}],
+          "Circle with dashes",
+          "Input values for outer radius, lengths of dashes and gaps and thickness.",
+          sc.el,
           "Create Circle")
-        // initialValue:sc]
-        r =         parseInt(inp[0])
-        segs =      Math.max(Math.round(parseInt(inp[1])),3)
-        thickness = Math.min(parseInt(inp[2]) || 1,r)
-        [def setObject:[{label: "Outer radius", data:r}, {label: "Number of segments", data:segs}, {label: "Thickness", data:thickness}] forKey:key]
-        segmentCircle(r, segs, thickness)
+        sc.el[0].data = parseInt(inp[0])
+        sc.el[1].data = parseInt(inp[1])
+        sc.el[2].data = parseInt(inp[2])
+        sc.el[3].data = parseInt(inp[3])
+        [def setObject:JSON.stringify(sc) forKey:key]
+        segmentCircle(sc.el[0].data, sc.el[1].data, sc.el[2].data, deg2rdns(sc.el[3].data))
     }
 
     //varSegmentCircle([50,30,20])
-    //varSegmentCircle(100, [40,30,20,10,5], 24)//debug
+    //varSegmentCircle(100, [40,30,20,10,5], 24, 2 * pi / 3)//debug
     //dashedCircle(100, 80, 40, 1)//debug
-    //ticksCircle(84, 100, 4, 8, 4, 4, 4, 20, pi/2)//debug
+    //ticksCircle(100, 84, 8, 4, 4, 4, 4, 20, deg2rdns(120))//debug
 }
 
-var segmentCircle = function(rCirc, numSegs, nThick){
+var segmentCircle = function(rCirc, numSegs, nThick, angOmit){
   var gr = doc.currentPage().addLayerOfType("group")
   var c = getRnCol()
   gr.setName("Segments circle")
 
-  var angSeg = 2 * pi / numSegs
+  var angRange = 2 * pi - angOmit
+  var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
+  var angSeg = angRange / numSegs
 
   for(var i = 0; i < numSegs; i++){
-    var shape = makeArcSeg(angSeg * i , angSeg * (i + 1), rCirc, nThick)
+    var shape = makeArcSeg(angSeg * i - angCor, angSeg * (i + 1) - angCor, rCirc, nThick)
     if (nThick > 1) {styleShapeArea(shape, c)} else {styleShape(shape, c)}
     shape.setName("Segment " + (i + 1))
     gr.addLayers([shape]);
@@ -80,15 +145,16 @@ var segmentCircle = function(rCirc, numSegs, nThick){
   placeLayer(gr)
 }
 
-var varSegmentCircle = function(rCirc, aSegments, nThick){
+var varSegmentCircle = function(rCirc, aSegments, nThick, angOmit){
   var numSegs = aSegments.length
-  var aSegs = preProcSeg(aSegments)
+  var aSegs = preProcSeg(aSegments, angOmit)
+  var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Variable segments circle")
   var aUsedCols = []
   for(var i = 0; i < numSegs; i++){
-    var shape = makeArcSeg(aSegs[i], aSegs[i + 1], rCirc, nThick)
+    var shape = makeArcSeg(aSegs[i] - angCor, aSegs[i + 1] - angCor, rCirc, nThick)
     if (nThick > 1) {styleShapeArea(shape,getRnCol(aUsedCols))} else {styleShape(shape,getRnCol(aUsedCols))}
     shape.setName("Segment " + (aSegments[i]))
     gr.addLayers([shape]);
@@ -96,25 +162,25 @@ var varSegmentCircle = function(rCirc, aSegments, nThick){
   placeLayer(gr)
 }
 
-var ticksCircle = function(rOutMin, rOutMaj, numMin, numMaj, nStrkMin, nStrkMaj, nThickMin, nThickMaj, angOmit) {
+var ticksCircle = function(rOutMaj, rOutMin, numMaj, numMin, nStrkMaj, nStrkMin, nThickMaj, nThickMin, angOmit) {
   //creates minor and major tickmarks along a circle minus the cutout angOmit
   var gr = doc.currentPage().addLayerOfType("group")
   var c1 = getRnCol()
-  var c2 = getRnCol()
+  var c2 = getNeutralColor()
   gr.setName("Tickmarks circle")
-  var grMaj = gr.addLayerOfType("group")
-  grMaj.setName("Major tickmarks")
   if (numMin > 0){
     var grMin = gr.addLayerOfType("group")
     grMin.setName("Minor tickmarks")
   }
+  var grMaj = gr.addLayerOfType("group")
+  grMaj.setName("Major tickmarks")
 
   var angRange = 2 * pi - angOmit
-  //alert(angRange,"Range:")
+  var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
+
   var cf = angRange * rOutMaj
   var angPx = angRange / Math.round(cf)
   var angDistTick = angRange / ((numMaj - 1) * (numMin + 1))
-  var angCor = (angOmit > 0) ? angOmit / 2 + pi / 2 : 0
   for(var i = 0; i < numMaj; i++){
     var a = (i * (numMin + 1)) * angDistTick - angCor
     var shape = makeArcSeg(a - ((nStrkMaj/2) * angPx) , a + ((nStrkMaj/2) * angPx), rOutMaj, nThickMaj)
@@ -134,6 +200,8 @@ var ticksCircle = function(rOutMin, rOutMaj, numMin, numMaj, nStrkMin, nStrkMaj,
     }
   }
   placeLayer(gr)
+  rszHndls(grMaj)
+  rszHndls(grMin)
 }
 
 var dashedCircle = function(rCirc, lDash, lGap, nThick) {
@@ -224,17 +292,23 @@ var rd2dec = function(num) {
     return Math.round(num * 100) / 100;
 }
 
-var preProcSeg = function(aSegments){
-  //normalize list arbitrary string numbers as distr. of a total of 2 * pi
+var preProcSeg = function(aSegments, angOmit){
+  //normalize list arbitrary string numbers as distr. of a total of angRange
   var aSegs = [0]
   var total = 0;
   var n = aSegments.length;
   var i = n;
+  var angRange = (2 * pi) - angOmit
+  var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
   while (i--) {total += parseInt(aSegments[i])}
-  var factor = 2 * pi / total
+  var factor = angRange / total
   for (i=1; i<=n; i++) {aSegs.push(aSegs[i-1] + (parseInt(aSegments[i-1]) * factor))}
-  aSegs[aSegs.length - 1] = 2 * pi
+  aSegs[aSegs.length - 1] = angRange
   return aSegs
+}
+
+var deg2rdns = function(angDeg) {
+  return angDeg * (2 * pi / 360)
 }
 
 var alert = function(sText, sTitle) {
@@ -259,7 +333,7 @@ var styleShapeArea = function(shapeGr, sC){
     fill.color = MSColor.colorWithSVGString(sC);
     var border = shapeGr.style().borders().addNewStylePart();
     border.color = MSColor.colorWithSVGString("#ffffff");
-    border.thickness = .5;
+    border.thickness = .25;
     border.position = 1;
 }
 
@@ -273,17 +347,21 @@ var placeLayer = function(lyr){
     rL.origin.x = vX
     rL.origin.y = vY
     lyr.setRect(rL)
-    if(sv <= 34400) {
-      lyr.resizeRoot(true)
-    } else {
-      lyr.resizeToFitChildrenWithOption(0)
-    }
+    rszHndls(lyr)
+}
+
+var rszHndls = function(lyr){
+  if(sv <= 34400) {
+    lyr.resizeRoot(true)
+  } else {
+    lyr.resizeToFitChildrenWithOption(0)
+  }
 }
 
 var getRnCol = function(aUsedSoFar){
   var aCols = ["#B71C1C","#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#0288D1","#00bcd4","#00bcd4","#4caf50","#8bc34a","#cddc39","#F9A825","#FF8F00","#F57C00","#D84315","#795548","#9e9e9e","#607d8b"]
   var c
-  if(aUsedSoFar){
+  if((aUsedSoFar) && (aUsedSoFar.length < aCols.length)){
     do {
   		c = aCols[Math.floor(Math.random() * aCols.length)]
   	} while(aUsedSoFar.indexOf(c) != -1)
@@ -292,6 +370,10 @@ var getRnCol = function(aUsedSoFar){
     c = aCols[Math.floor(Math.random() * aCols.length)]
   }
   return c
+}
+
+var getNeutralColor = function(){
+  return "#455A64"
 }
 
 var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
