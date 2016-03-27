@@ -185,19 +185,19 @@ var ticksCircle = function(rOutMaj, rOutMin, numMaj, numMin, nStrkMaj, nStrkMin,
 
   var angRange = 2 * pi - angOmit
   var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
-
+  var nExtra = (angOmit > 0) ? 1 : 0 //draw an extra closing one if circle is open
   var cf = angRange * rOutMaj
   var angPx = angRange / Math.round(cf)
-  var angDistTick = angRange / ((numMaj - 1) * (numMin + 1))
-  for(var i = 0; i < numMaj; i++){
+  var angDistTick = angRange / ((numMaj - 0) * (numMin + 1))
+  for(var i = 0; i < numMaj + nExtra; i++){
     var a = (i * (numMin + 1)) * angDistTick - angCor
     var shape = makeArcSeg(a - ((nStrkMaj/2) * angPx) , a + ((nStrkMaj/2) * angPx), rOutMaj, nThickMaj)
     if (nThickMaj > 1) {styleShapeArea(shape,c1)} else {styleShape(shape,c1)}
     shape.setName("Tick major " + (i * (numMin + 1)))
     grMaj.addLayers([shape]);
 
-    if(numMin >= 1 && (i < (numMaj - 1))){
-      var ub = (i == (numMaj - 2)) ? numMin + 2 : numMin + 1 // last minor tick under the last major one
+    if(numMin >= 1 && (i < (numMaj - 0))){
+      var ub = (i == (numMaj + nExtra - 2)) ? numMin + 2 : numMin + 1 // last minor tick under the last major one
       for(var j = 0; j < ub; j++){
         var a = ((i * (numMin + 1)) + j) * angDistTick - angCor
         var shape = makeArcSeg(a - ((nStrkMin/2) * angPx) , a + ((nStrkMin/2) * angPx), rOutMin, nThickMin)
