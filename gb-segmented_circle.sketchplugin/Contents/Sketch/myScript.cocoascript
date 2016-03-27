@@ -11,7 +11,7 @@ var onRun = function(context) {
   vals = "40,30,20,10,5"
   thickness = 20
   omit = 0
-  stMaj = 6
+  stMaj = 4
   stMin = 2
   nMaj = 12
   nMin = 4
@@ -60,13 +60,13 @@ var start = function(whichOne){
         var key = "gb_segCircle_tix" //retrieve value from defaults, if none set
         var sc = JSON.parse([def objectForKey:key]) || {el:[
                                                             {label: "Outer radius major ticks", data: r},
-                                                            {label: "Outer radius minor ticks", data: r},
+                                                            {label: "Outer radius minor ticks", data: r-5},
                                                             {label: "Major ticks", data: nMaj},
                                                             {label: "Minor ticks in between", data: nMin},
                                                             {label: "Major ticks stroke", data: stMaj},
                                                             {label: "Minor ticks stroke", data: stMin},
                                                             {label: "Major ticks length", data: thickness},
-                                                            {label: "Minor ticks length", data: thickness},
+                                                            {label: "Minor ticks length", data: thickness/2},
                                                             {label: "Bottom cutout angle", data: omit}
                                                         ]}
         var inp = showDlg(
@@ -188,15 +188,15 @@ var ticksCircle = function(rOutMaj, rOutMin, numMaj, numMin, nStrkMaj, nStrkMin,
   var nExtra = (angOmit > 0) ? 1 : 0 //draw an extra closing one if circle is open
   var cf = angRange * rOutMaj
   var angPx = angRange / Math.round(cf)
-  var angDistTick = angRange / ((numMaj - 0) * (numMin + 1))
-  for(var i = 0; i < numMaj + nExtra; i++){
+  var angDistTick = angRange / ((numMaj - nExtra) * (numMin + 1))
+  for(var i = 0; i < numMaj; i++){
     var a = (i * (numMin + 1)) * angDistTick - angCor
     var shape = makeArcSeg(a - ((nStrkMaj/2) * angPx) , a + ((nStrkMaj/2) * angPx), rOutMaj, nThickMaj)
     if (nThickMaj > 1) {styleShapeArea(shape,c1)} else {styleShape(shape,c1)}
     shape.setName("Tick major " + (i * (numMin + 1)))
     grMaj.addLayers([shape]);
 
-    if(numMin >= 1 && (i < (numMaj - 0))){
+    if(numMin >= 1 && (i < (numMaj - nExtra))){
       var ub = (i == (numMaj + nExtra - 2)) ? numMin + 2 : numMin + 1 // last minor tick under the last major one
       for(var j = 0; j < ub; j++){
         var a = ((i * (numMin + 1)) + j) * angDistTick - angCor
