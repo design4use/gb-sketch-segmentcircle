@@ -25,6 +25,7 @@ var onRun = function(context) {
   //start()
 }
 
+//menu items system
 var c_seg = function(context){onRun(context);start("seg")}
 var c_var = function(context){onRun(context);start("var")}
 var c_dsh = function(context){onRun(context);start("dsh")}
@@ -206,9 +207,9 @@ var ticksCircle = function(rOutMaj, rOutMin, numMaj, numMin, nStrkMaj, nStrkMin,
       }
     }
   }
-  placeLayer(gr)
   rszHndls(grMaj)
   rszHndls(grMin)
+  placeLayer(gr)
 }
 
 var dashedCircle = function(rCirc, lDash, lGap, nThick) {
