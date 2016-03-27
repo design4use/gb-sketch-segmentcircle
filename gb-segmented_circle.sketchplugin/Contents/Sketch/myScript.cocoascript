@@ -1,5 +1,5 @@
 var doc, pi, pArray, def, sv
-var r, segs, idealsegs, vals, thickness, omit, stMaj, stMin, nMaj, nMin
+var r, segs, idealsegs, vals, thickness, omit, stMaj, stMin, nMaj, nMin, dash, gap
 
 var onRun = function(context) {
   // Global variables
@@ -15,16 +15,23 @@ var onRun = function(context) {
   stMin = 2
   nMaj = 12
   nMin = 4
+  dash = 32
+  gap = 16
 
   pArray = []
   def = [NSUserDefaults standardUserDefaults]
   sv = getSkVer()
   //actual functions
-  start()
+  //start()
 }
 
-var start = function(){
-    var whichOne = "var"//switch case which type of segmented circles
+var c_seg = function(context){onRun(context);start("seg")}
+var c_var = function(context){onRun(context);start("var")}
+var c_dsh = function(context){onRun(context);start("dsh")}
+var c_tix = function(context){onRun(context);start("tix")}
+
+var start = function(whichOne){
+    //var whichOne = "var"//switch case which type of segmented circles
     switch (whichOne) {
 
       case "var":
@@ -37,7 +44,7 @@ var start = function(){
                                                         ]}
         var inp = showDlg(
           "Variable Segments Circle",
-          "Input radius, values and thickness. \n\nValues are a comma seperated list of numbers.",
+          "Input radius, values and thickness.\nUse a thickness of 1 or less to create lines instead of areas. \n\nValues are a comma seperated list of numbers.",
           sc.el,
           "Create Circle")
         sc.el[0].data = parseInt(inp[0])
@@ -48,7 +55,7 @@ var start = function(){
         varSegmentCircle(sc.el[0].data, sc.el[1].data.split(","), sc.el[2].data, deg2rdns(sc.el[3].data))
       break;
 
-      case "ticks":
+      case "tix":
         var key = "gb_segCircle_tix" //retrieve value from defaults, if none set
         var sc = JSON.parse([def objectForKey:key]) || {el:[
                                                             {label: "Outer radius major ticks", data: r},
@@ -79,17 +86,17 @@ var start = function(){
         ticksCircle(sc.el[0].data, sc.el[1].data, sc.el[2].data, sc.el[3].data, sc.el[4].data, sc.el[5].data, sc.el[6].data, sc.el[7].data, deg2rdns(sc.el[8].data))
       break;
 
-      case "dashes":
+      case "dsh":
         var key = "gb_segCircle_dsh" //retrieve value from defaults, if none set
         var sc = JSON.parse([def objectForKey:key]) || {el:[
                                                             {label: "Outer radius", data: r},
-                                                            {label: "Length of dashes", data: stMaj},
-                                                            {label: "Length of gaps", data: stMin},
-                                                            {label: "Thickness", data: thickness}
+                                                            {label: "Length of dashes", data: dash},
+                                                            {label: "Length of gaps", data: gap},
+                                                            {label: "Thickness", data: nMin}
                                                         ]}
         var inp = showDlg(
           "Circle with dashes",
-          "Input values for outer radius, lengths of dashes and gaps and thickness.",
+          "Input values for outer radius, lengths of dashes and gaps and thickness.\nUse a thickness of 1 or less to create lines instead of areas.",
           sc.el,
           "Create Circle")
         sc.el[0].data = parseInt(inp[0])
@@ -109,8 +116,8 @@ var start = function(){
                                                             {label: "Bottom cutout angle", data: omit}
                                                         ]}
         var inp = showDlg(
-          "Circle with dashes",
-          "Input values for outer radius, lengths of dashes and gaps and thickness.",
+          "Segmented circle",
+          "Input values for outer radius, number of segments, thickness etc. \nUse a thickness of 1 or less to create lines instead of areas.",
           sc.el,
           "Create Circle")
         sc.el[0].data = parseInt(inp[0])

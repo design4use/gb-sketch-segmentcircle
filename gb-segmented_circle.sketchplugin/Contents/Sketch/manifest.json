@@ -4,20 +4,43 @@
     "author" : "German Bauer",
     "authorEmail" : "design4use@gmail.com",
     "homepage": "https://github.com/",
-    "version" : "1.49",
+    "version" : "1.99",
     "identifier" : "com.germanbauer.gb-segmented_circle",
     "compatibleVersion": "3.4",
     "bundleVersion": "1",
+
     "commands" : [
         {
-            "script" : "myScript.cocoascript",
-            "shortcut" : "ctrl shift 0",
-            "name" : "Create segmented circle",
-            "identifier" : "item1"
+            "script" :    "myScript.cocoascript",
+            "shortcut" :  "ctrl shift 0",
+            "name" :      "Create segmented circle",
+            "handler" :   "c_seg",
+            "identifier" : "item_seg"
+        },
+        {
+            "script" :    "myScript.cocoascript",
+            "shortcut" :  "ctrl shift 9",
+            "name" :      "Create variable segments circle",
+            "handler" :   "c_var",
+            "identifier" : "item_var"
+        },
+        {
+            "script" :    "myScript.cocoascript",
+            "shortcut" :  "ctrl shift 8",
+            "name" :      "Create tickmarks circle",
+            "handler" :   "c_tix",
+            "identifier" : "item_tix"
+        },
+        {
+            "script" :    "myScript.cocoascript",
+            "shortcut" :  "ctrl shift 7",
+            "name" :      "Create dashed circle",
+            "handler" :   "c_dsh",
+            "identifier" : "item_dsh"
         }
     ],
     "menu" : {
-        "title" : "Segmented Circle",
-        "items" : ["item1"]
+        "title" : "Segmented Circles",
+        "items" : ["item_seg", "item_var", "item_tix", "item_dsh"]
     }
 }
