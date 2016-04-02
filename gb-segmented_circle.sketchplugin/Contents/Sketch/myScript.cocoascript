@@ -139,6 +139,8 @@ var segmentCircle = function(rCirc, numSegs, nThick, angOmit){
   var gr = doc.currentPage().addLayerOfType("group")
   var c = getRnCol()
   gr.setName("Segments circle")
+  var bP = makeBasePlate(rCirc, nThick)
+  gr.addLayers([bP])
 
   var angRange = 2 * pi - angOmit
   var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
@@ -160,6 +162,8 @@ var varSegmentCircle = function(rCirc, aSegments, nThick, angOmit){
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Variable segments circle")
+  var bP = makeBasePlate(rCirc, nThick)
+  gr.addLayers([bP])
   var aUsedCols = []
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(aSegs[i] - angCor, aSegs[i + 1] - angCor, rCirc, nThick)
@@ -179,9 +183,13 @@ var ticksCircle = function(rOutMaj, rOutMin, numMaj, numMin, nStrkMaj, nStrkMin,
   if (numMin > 0){
     var grMin = gr.addLayerOfType("group")
     grMin.setName("Minor tickmarks")
+    var bPMin = makeBasePlate(rOutMin, nThickMin)
+    grMin.addLayers([bPMin])
   }
   var grMaj = gr.addLayerOfType("group")
   grMaj.setName("Major tickmarks")
+  var bPMaj = makeBasePlate(rOutMaj, nThickMaj)
+  grMaj.addLayers([bPMaj])
 
   var angRange = 2 * pi - angOmit
   var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
@@ -224,6 +232,9 @@ var dashedCircle = function(rCirc, lDash, lGap, nThick) {
 
   var gr = doc.currentPage().addLayerOfType("group")
   gr.setName("Dashed circle")
+  var bP = makeBasePlate(rCirc, nThick)
+  gr.addLayers([bP])
+
   var c = getRnCol()
   for(var i = 0; i < numSegs; i++){
     var shape = makeArcSeg(angSeg * i, (angSeg * i) + angDash, rCirc, nThick)
@@ -296,6 +307,16 @@ var makeArcSeg = function(angStart, angEnd, rSeg, nThick){
   return MSShapeGroup.shapeWithBezierPath(path);
 }
 
+var makeBasePlate = function(r, nThick){
+  var shape = makeArcSeg(0, 2 * pi, r, nThick)
+  var c = getNeutralColor()
+  c.alpha = 0.002
+  var fill = shape.style().fills().addNewStylePart()
+  fill.color = c
+  shape.setName("Base plate")
+  return shape
+}
+
 var rd2dec = function(num) {
     return Math.round(num * 100) / 100;
 }
@@ -330,15 +351,15 @@ var getViewF = function(){
     return [view frame];
 }
 
-var styleShape = function(shapeGr, sC){
+var styleShape = function(shapeGr, msC){
     var border = shapeGr.style().borders().addNewStylePart();
-    border.color = MSColor.colorWithSVGString(sC);
+    border.color = msC;
     border.thickness = 2;
 }
 
-var styleShapeArea = function(shapeGr, sC){
+var styleShapeArea = function(shapeGr, msC){
     var fill = shapeGr.style().fills().addNewStylePart();
-    fill.color = MSColor.colorWithSVGString(sC);
+    fill.color = msC;
     var border = shapeGr.style().borders().addNewStylePart();
     border.color = MSColor.colorWithSVGString("#ffffff");
     border.thickness = .25;
@@ -377,11 +398,15 @@ var getRnCol = function(aUsedSoFar){
   } else {
     c = aCols[Math.floor(Math.random() * aCols.length)]
   }
-  return c
+  var msc = MSColor.colorWithSVGString(c);
+  //msc.alpha = 0.99
+  return msc
 }
 
 var getNeutralColor = function(){
-  return "#455A64"
+  var msc = MSColor.colorWithSVGString("#455A64");
+  //msc.alpha = 0.99
+  return msc
 }
 
 var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
@@ -412,4 +437,12 @@ var getSkVer = function() {
 		v2 = v2 + "0"
 	} while(v2.length <= 4)
 	return (Number(v2) + 0)
+}
+
+var resetToDef = function() {
+  var def = [NSUserDefaults standardUserDefaults]
+  [def removeObjectForKey:"gb_segCircle_dsh"]
+  [def removeObjectForKey:"gb_segCircle_tix"]
+  [def removeObjectForKey:"gb_segCircle_var"]
+  [def removeObjectForKey:"gb_segCircle_seg"]
 }

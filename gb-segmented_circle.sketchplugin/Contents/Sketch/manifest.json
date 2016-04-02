@@ -37,10 +37,16 @@
             "name" :      "Create dashed circle",
             "handler" :   "c_dsh",
             "identifier" : "item_dsh"
+        },
+        {
+            "script" :    "myScript.cocoascript",
+            "name" :      "Reset to Defaults",
+            "handler" :   "resetToDef",
+            "identifier" : "item_defaults"
         }
     ],
     "menu" : {
-        "title" : "Segmented Circles",
-        "items" : ["item_seg", "item_var", "item_tix", "item_dsh"]
+        "title" : "◯  Segmented Circles",
+        "items" : ["item_seg", "item_var", "item_tix", "item_dsh", "item_defaults"]
     }
 }
