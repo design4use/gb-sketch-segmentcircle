@@ -46,7 +46,7 @@
         }
     ],
     "menu" : {
-        "title" : "◯  Segmented Circles",
+        "title" : "Segmented Circles ◯ ",
         "items" : ["item_seg", "item_var", "item_tix", "item_dsh", "item_defaults"]
     }
 }

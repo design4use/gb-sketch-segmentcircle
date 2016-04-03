@@ -32,7 +32,7 @@ var c_dsh = function(context){onRun(context);start("dsh")}
 var c_tix = function(context){onRun(context);start("tix")}
 
 var start = function(whichOne){
-    //var whichOne = "var"//switch case which type of segmented circles
+    //switch case which type of segmented circles
     switch (whichOne) {
 
       case "var":
@@ -410,16 +410,15 @@ var getNeutralColor = function(){
 }
 
 var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
-  var dlg = COSAlertWindow.new();
-	dlg.setMessageText(sMsg || "Plugin dialog");
-	dlg.setInformativeText(sInfo || "To run this plugin more data will be needed");
+  var dlg = COSAlertWindow.new()
+  dlg.setMessageText(sMsg || "Plugin dialog")
+	dlg.setInformativeText(sInfo || "To run this plugin more data will be needed")
   for(var i = 0; i < aFields.length; i++){
-    dlg.addTextLabelWithValue(aFields[i].label.toString() || ("Field " + i));
-  	dlg.addTextFieldWithValue(aFields[i].data.toString()  || ("Data " + i));
+    dlg.addTextLabelWithValue(aFields[i].label.toString() || ("Field " + i))
+  	dlg.addTextFieldWithValue(aFields[i].data.toString()  || ("Data " + i))
   }
-	dlg.addButtonWithTitle( sBtnGoText || 'OK');
-	dlg.addButtonWithTitle('Cancel');
-
+	dlg.addButtonWithTitle( sBtnGoText || 'OK')
+	dlg.addButtonWithTitle('Cancel')
   var aResults = []
 	if(dlg.runModal() == 1000) {
     for(var i = 1; i < aFields.length * 2; i+=2) {
