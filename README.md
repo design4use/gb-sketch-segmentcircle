@@ -52,4 +52,4 @@ Removes last used values and resets to defaults.
 Download the .zip file. Double click the .sketchplugin file inside it.
 
 ## License
-(c)2016 German Bauer. All code covered by [this MIT 2-clause style license](./LICENSE.md)
+(c)2016 German Bauer. All code covered by [this BSD 2-clause style license](./LICENSE.md)
