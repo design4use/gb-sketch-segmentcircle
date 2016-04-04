@@ -4,7 +4,7 @@ Saves hours by automatically creating precise circular graphics as areas or line
 ![](./img/screencapture.png)
 
 ## Brand new version 2.0
-Completely new plugin, now also supporting variable values pie chart segments, perfectly spaced dashed circles and tickmark circles.
+Completely rewritten plugin, now also creating variable values pie chart segments, perfectly spaced dashed circles and tick mark graphics.
 
 ## Description
 ### Create segmented circle
