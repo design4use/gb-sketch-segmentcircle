@@ -19,24 +19,28 @@
         },
         {
             "script" :    "myScript.cocoascript",
+            "shortcut" :  "",
             "name" :      "Create Variable Segments Circle",
             "handler" :   "c_var",
             "identifier" : "item_var"
         },
         {
             "script" :    "myScript.cocoascript",
+            "shortcut" :  "",
             "name" :      "Create Tickmarks Circle",
             "handler" :   "c_tix",
             "identifier" : "item_tix"
         },
         {
             "script" :    "myScript.cocoascript",
+            "shortcut" :  "",
             "name" :      "Create Dashed Circle",
             "handler" :   "c_dsh",
             "identifier" : "item_dsh"
         },
         {
             "script" :    "myScript.cocoascript",
+            "shortcut" :  "",
             "name" :      "Reset to Defaults",
             "handler" :   "resetToDef",
             "identifier" : "item_defaults"
