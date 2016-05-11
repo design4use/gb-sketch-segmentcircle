@@ -354,18 +354,34 @@ var getViewF = function(){
 }
 
 var styleShape = function(shapeGr, msC){
-    var border = shapeGr.style().borders().addNewStylePart();
+    var border = mkBorder(shapeGr);
     border.color = msC;
     border.thickness = 2;
 }
 
 var styleShapeArea = function(shapeGr, msC){
-    var fill = shapeGr.style().fills().addNewStylePart();
+    var fill = mkFill(shapeGr);
     fill.color = msC;
-    var border = shapeGr.style().borders().addNewStylePart();
+    var border = mkBorder(shapeGr);
     border.color = MSColor.colorWithSVGString("#ffffff");
     border.thickness = .25;
     border.position = 1;
+}
+
+var mkFill = function(shapeGr){
+  if(sv >= 38000) {
+    return shapeGr.style().addStylePartOfType(0);
+  } else {
+    return shapeGr.style().fills().addNewStylePart();
+  }
+}
+
+var mkBorder = function(shapeGr){
+  if(sv >= 38000) {
+    return shapeGr.style().addStylePartOfType(1);
+  } else {
+    return shapeGr.style().borders().addNewStylePart();
+  }
 }
 
 var placeLayer = function(lyr){
