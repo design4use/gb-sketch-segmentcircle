@@ -313,7 +313,7 @@ var makeBasePlate = function(r, nThick){
   var shape = makeArcSeg(0, 2 * pi, r, nThick)
   var c = getNeutralColor()
   c.alpha = 0.002
-  var fill = shape.style().fills().addNewStylePart()
+  var fill = mkFill(shape)
   fill.color = c
   shape.setName("Base plate")
   return shape
