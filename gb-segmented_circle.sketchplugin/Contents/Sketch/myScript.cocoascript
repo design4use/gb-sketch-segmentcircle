@@ -50,6 +50,8 @@ var start = function(whichOne){
           "Input radius, values and thickness.\nUse a thickness of 1 or less to create lines instead of areas. \n\nValues are a comma seperated list of numbers.",
           sc.el,
           "Create Circle")
+        if (inp == nil) return
+
         sc.el[0].data = parseInt(inp[0])
         sc.el[1].data = inp[1].split(",").join(",") //not sure why it only works this way
         sc.el[2].data = parseInt(inp[2])
@@ -76,6 +78,8 @@ var start = function(whichOne){
           "Input values for major and minor ticks.",
           sc.el,
           "Create Circle")
+        if (inp == nil) return
+
         sc.el[0].data = parseInt(inp[0])
         sc.el[1].data = parseInt(inp[1])
         sc.el[2].data = parseInt(inp[2])
@@ -102,6 +106,8 @@ var start = function(whichOne){
           "Input values for outer radius, lengths of dashes and gaps and thickness.\nUse a thickness of 1 or less to create lines instead of areas.",
           sc.el,
           "Create Circle")
+        if (inp == nil) return
+
         sc.el[0].data = parseInt(inp[0])
         sc.el[1].data = parseInt(inp[1])
         sc.el[2].data = parseInt(inp[2])
@@ -123,6 +129,8 @@ var start = function(whichOne){
           "Input values for outer radius, number of segments, thickness etc. \nUse a thickness of 1 or less to create lines instead of areas.",
           sc.el,
           "Create Circle")
+        if (inp == nil) return
+
         sc.el[0].data = parseInt(inp[0])
         sc.el[1].data = parseInt(inp[1])
         sc.el[2].data = parseInt(inp[2])
@@ -313,7 +321,7 @@ var makeBasePlate = function(r, nThick){
   var shape = makeArcSeg(0, 2 * pi, r, nThick)
   var c = getNeutralColor()
   c.alpha = 0.002
-  var fill = shape.style().fills().addNewStylePart()
+  var fill = mkFill(shape)
   fill.color = c
   shape.setName("Base plate")
   return shape
@@ -354,33 +362,34 @@ var getViewF = function(){
 }
 
 var styleShape = function(shapeGr, msC){
-    var border = mkBorder(shapeGr);
-    border.color = msC;
-    border.thickness = 2;
+    var border = mkBorder(shapeGr)
+    border.color = msC
+    border.thickness = 2
 }
 
 var styleShapeArea = function(shapeGr, msC){
-    var fill = mkFill(shapeGr);
-    fill.color = msC;
-    var border = mkBorder(shapeGr);
-    border.color = MSColor.colorWithSVGString("#ffffff");
-    border.thickness = .25;
-    border.position = 1;
+    var fill = mkFill(shapeGr)
+    fill.color = msC
+    var border = mkBorder(shapeGr)
+    var border = shapeGr.style().addStylePartOfType(1)
+    border.color = MSColor.colorWithSVGString("#ffffff")
+    border.thickness = .25
+    border.position = 1
 }
 
-var mkFill = function(shapeGr){
+function mkFill(shapeGr){
   if(sv >= 38000) {
-    return shapeGr.style().addStylePartOfType(0);
+    return shapeGr.style().addStylePartOfType(0)
   } else {
-    return shapeGr.style().fills().addNewStylePart();
+    return shapeGr.style().fills().addNewStylePart()
   }
 }
 
-var mkBorder = function(shapeGr){
+function mkBorder(shapeGr){
   if(sv >= 38000) {
-    return shapeGr.style().addStylePartOfType(1);
+    return shapeGr.style().addStylePartOfType(1)
   } else {
-    return shapeGr.style().borders().addNewStylePart();
+    return shapeGr.style().borders().addNewStylePart()
   }
 }
 
@@ -442,6 +451,8 @@ var showDlg = function(sMsg, sInfo, aFields, sBtnGoText){
     for(var i = 1; i < aFields.length * 2; i+=2) {
       aResults.push(dlg.viewAtIndex(i).stringValue().toString()) //only every other, we don't care about labels
     }
+  } else {
+    aResults = nil
   }
   //alert(aResults,"Returning this array from dialog:")
   return aResults
