@@ -146,9 +146,8 @@ var start = function(whichOne){
 }
 
 var segmentCircle = function(rCirc, numSegs, nThick, angOmit){
-  var gr = doc.currentPage().addLayerOfType("group")
+  var gr = mkGroup(doc.currentPage(), "Segments circle")
   var c = getRnCol()
-  gr.setName("Segments circle")
   var bP = makeBasePlate(rCirc, nThick)
   gr.addLayers([bP])
 
@@ -170,8 +169,7 @@ var varSegmentCircle = function(rCirc, aSegments, nThick, angOmit){
   var aSegs = preProcSeg(aSegments, angOmit)
   var angCor = (angOmit > 0) ? pi - (angOmit / 2) : 0 //rotate the circle to have the gap on bottom
 
-  var gr = doc.currentPage().addLayerOfType("group")
-  gr.setName("Variable segments circle")
+  var gr = mkGroup(doc.currentPage(), "Variable segments circle")
   var bP = makeBasePlate(rCirc, nThick)
   gr.addLayers([bP])
   var aUsedCols = []
@@ -186,18 +184,15 @@ var varSegmentCircle = function(rCirc, aSegments, nThick, angOmit){
 
 var ticksCircle = function(rOutMaj, rOutMin, numMaj, numMin, nStrkMaj, nStrkMin, nThickMaj, nThickMin, angOmit) {
   //creates minor and major tickmarks along a circle minus the cutout angOmit
-  var gr = doc.currentPage().addLayerOfType("group")
+  var gr = mkGroup(doc.currentPage(), "Tickmarks circle")
   var c1 = getRnCol()
   var c2 = getNeutralColor()
-  gr.setName("Tickmarks circle")
   if (numMin > 0){
-    var grMin = gr.addLayerOfType("group")
-    grMin.setName("Minor tickmarks")
+    var grMin = mkGroup(gr, "Minor tickmarks")
     var bPMin = makeBasePlate(rOutMin, nThickMin)
     grMin.addLayers([bPMin])
   }
-  var grMaj = gr.addLayerOfType("group")
-  grMaj.setName("Major tickmarks")
+  var grMaj = mkGroup(gr, "Major tickmarks")
   var bPMaj = makeBasePlate(rOutMaj, nThickMaj)
   grMaj.addLayers([bPMaj])
 
@@ -240,8 +235,7 @@ var dashedCircle = function(rCirc, lDash, lGap, nThick) {
   var angDash = angSeg * lDash / lSeg
   var angGap = angSeg - angDash
 
-  var gr = doc.currentPage().addLayerOfType("group")
-  gr.setName("Dashed circle")
+  var gr = mkGroup(doc.currentPage(), "Dashed circle")
   var bP = makeBasePlate(rCirc, nThick)
   gr.addLayers([bP])
 
@@ -390,6 +384,17 @@ function mkBorder(shapeGr){
   } else {
     return shapeGr.style().borders().addNewStylePart()
   }
+}
+
+function mkGroup(parentL, name) {
+  if(sv >= 38000) {
+    var group = [MSLayerGroup new]
+    parentL.addLayers([group])
+  } else {
+    var group = parentL.addLayerOfType("group")
+  }
+  [group setName:name]
+  return group
 }
 
 var placeLayer = function(lyr){
