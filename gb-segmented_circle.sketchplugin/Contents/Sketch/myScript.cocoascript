@@ -363,9 +363,10 @@ var styleShape = function(shapeGr, msC){
 
 var styleShapeArea = function(shapeGr, msC){
     var fill = mkFill(shapeGr)
+    fill..setFillType(0)
     fill.color = msC
     var border = mkBorder(shapeGr)
-    border.color = MSColor.colorWithSVGString("#ffffff")
+    border.color = colorWithHexString("#ffffff")
     border.thickness = .25
     border.position = 1
 }
@@ -383,6 +384,14 @@ function mkBorder(shapeGr){
     return shapeGr.style().addStylePartOfType(1)
   } else {
     return shapeGr.style().borders().addNewStylePart()
+  }
+}
+
+function colorWithHexString(sHex){
+  if(sv >= 40000) {
+    return MSImmutableColor.colorWithSVGString(sHex).newMutableCounterpart()
+  } else {
+    return MSColor.colorWithSVGString(sHex)
   }
 }
 
@@ -429,13 +438,13 @@ var getRnCol = function(aUsedSoFar){
   } else {
     c = aCols[Math.floor(Math.random() * aCols.length)]
   }
-  var msc = MSColor.colorWithSVGString(c);
+  var msc = colorWithHexString(c);
   //msc.alpha = 0.99
   return msc
 }
 
 var getNeutralColor = function(){
-  var msc = MSColor.colorWithSVGString("#455A64");
+  var msc = colorWithHexString("#455A64");
   //msc.alpha = 0.99
   return msc
 }
