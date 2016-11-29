@@ -363,7 +363,7 @@ var styleShape = function(shapeGr, msC){
 
 var styleShapeArea = function(shapeGr, msC){
     var fill = mkFill(shapeGr)
-    fill..setFillType(0)
+    fill.setFillType(0)
     fill.color = msC
     var border = mkBorder(shapeGr)
     border.color = colorWithHexString("#ffffff")
