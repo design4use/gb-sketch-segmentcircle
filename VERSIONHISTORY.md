@@ -1,5 +1,7 @@
 # Update history
 
+##### Nov 28, 2016
+* 2.03 version, updated to also support v41 and earlier
 
 ##### July 11, 2016
 * 2.02 version, updated to also support v39

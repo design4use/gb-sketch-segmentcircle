@@ -3,8 +3,8 @@ Saves hours by automatically creating precise circular graphics as areas or line
 
 ![](./img/screencapture.png)
 
-## Brand new version 2.02
-Completely rewritten v2 plugin, now also creating variable values pie chart segments, perfectly spaced dashed circles and tick mark graphics. 2.02 adds support for Sketch v39
+## Brand new version 2.03
+Completely rewritten v2 plugin, now also creating variable values pie chart segments, perfectly spaced dashed circles and tick mark graphics. 2.02 adds support for Sketch v39, 2.03 for Sketch v40+
 
 ## Description
 ### Create segmented circle
