@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Segmented Circles ◯</title>
+    <link>http://sparkle-project.org/files/sparkletestcast.xml</link>
+    <description>Create precise segmented circular graphics for diagrams, instrumentation and analytics</description>
+    <language>en</language>
+      <item>
+        <title>Segmented Circles 2.0.5</title>
+        <description>
+          <![CDATA[
+            <ul>
+              <li>Update v2.0.5, adding auto-updates</li>
+            </ul>
+          ]]>
+        </description>
+        <enclosure url="https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.0.5.zip" sparkle:version="2.0.5" />
+      </item>
+      <item>
+        <title>Segmented Circles 2.0.4</title>
+        <description>
+          <![CDATA[
+            <ul>
+              <li>Update v2.0.4, adding Skecth 50 and Sketch Runner compatibility</li>
+            </ul>
+          ]]>
+        </description>
+        <enclosure url="https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.0.4.zip" sparkle:version="2.0.4" />
+      </item>
+  </channel>
+</rss>
