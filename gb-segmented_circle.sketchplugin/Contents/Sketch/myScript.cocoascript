@@ -308,6 +308,9 @@ var makeArcSeg = function(angStart, angEnd, rSeg, nThick){
     }
     [path closePath]
   }
+  if(sv >= 50000) {
+    path = MSPath.pathWithBezierPath(path); //update for 50
+  }
   return MSShapeGroup.shapeWithBezierPath(path);
 }
 
