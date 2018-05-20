@@ -5,6 +5,7 @@ Saves hours by automatically creating precise circular graphics as areas or line
 
 ## Brand new version 2.04
 Completely rewritten v2 plugin, now also creating variable values pie chart segments, perfectly spaced dashed circles and tick mark graphics. 2.04 adds support for Sketch 50 as well as Sketch Runner (http://www.sketchrunner.com)
+To install, [Download here](https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.04.zip), then double click the .sketchplugin file inside the zip file.
 
 ## Description
 ### Create segmented circle
@@ -47,9 +48,6 @@ Note: Some of these will allow to configure a bottom cut-out angle (in degrees).
 
 ### Reset to defaults
 Removes last used values and resets to defaults.
-
-## How to install for Sketch (3.4 or higher supported)
-Download the .zip file. Double click the .sketchplugin file inside it.
 
 ## License
 (c)2016 German Bauer. All code covered by [this BSD 2-clause style license](./LICENSE.md)
