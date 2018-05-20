@@ -3,6 +3,7 @@
     "description" : "Create precise segmented circular graphics for diagrams, instrumentation and analytics",
     "author" : "German Bauer",
     "authorEmail" : "design4use@gmail.com",
+    "icon" : "icon.png",
     "appcast" : "https://raw.githubusercontent.com/design4use/gb-sketch-segmentcircle/master/appcast.xml",
     "homepage": "https://github.com/design4use/gb-sketch-segmentcircle",
     "version" : "2.05",
