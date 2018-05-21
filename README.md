@@ -51,4 +51,4 @@ Note: Some of these will allow to configure a bottom cut-out angle (in degrees).
 Removes last used values and resets to defaults.
 
 ## License
-(c)2016 German Bauer. All code covered by [this BSD 2-clause style license](./LICENSE.md)
+(c)2018 German Bauer. All code covered by [this BSD 2-clause style license](./LICENSE.md)
