@@ -1,3 +1,5 @@
+To install, [Download here](https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.05.zip), then double click the .sketchplugin file inside the zip file.
+
 # Segmented circles
 Saves hours by automatically creating precise circular graphics as areas or lines with custom segments for analytics, graphs and dashboards.
 
