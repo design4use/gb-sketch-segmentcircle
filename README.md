@@ -1,4 +1,4 @@
-To install, [Download here](https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.05.zip), then double click the .sketchplugin file inside the zip file.
+*To install*, [Download here](https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.05.zip), then double click the .sketchplugin file inside the zip file.
 
 # Segmented circles
 Saves hours by automatically creating precise circular graphics as areas or lines with custom segments for analytics, graphs and dashboards.
@@ -7,8 +7,6 @@ Saves hours by automatically creating precise circular graphics as areas or line
 
 ## Brand new version 2.04
 Completely rewritten v2 plugin, now also creating variable values pie chart segments, perfectly spaced dashed circles and tick mark graphics. 2.04 adds support for Sketch 50 as well as Sketch Runner (http://www.sketchrunner.com)
-
-To install, [Download here](https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.05.zip), then double click the .sketchplugin file inside the zip file.
 
 ## Description
 ### Create segmented circle
