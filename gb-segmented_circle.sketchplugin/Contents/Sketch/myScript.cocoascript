@@ -160,6 +160,7 @@ var segmentCircle = function(rCirc, numSegs, nThick, angOmit){
     if (nThick > 1) {styleShapeArea(shape, c)} else {styleShape(shape, c)}
     shape.setName("Segment " + (i + 1))
     gr.addLayers([shape]);
+    //gr.adjustToFit();
   }
   placeLayer(gr)
 }
@@ -410,6 +411,7 @@ function mkGroup(parentL, name) {
 }
 
 var placeLayer = function(lyr){
+    rszHndls(lyr)
     var rL = lyr.rect();
     var v = getViewF();
     var so = [doc scrollOrigin];
@@ -419,7 +421,7 @@ var placeLayer = function(lyr){
     rL.origin.x = vX
     rL.origin.y = vY
     lyr.setRect(rL)
-    rszHndls(lyr)
+    //rszHndls(lyr)
 }
 
 var rszHndls = function(lyr){
