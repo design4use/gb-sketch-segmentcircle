@@ -312,7 +312,7 @@ var makeArcSeg = function(angStart, angEnd, rSeg, nThick){
   if(sv >= 50000) {
     path = MSPath.pathWithBezierPath(path); //update for 50
   }
-  return MSShapeGroup.shapeWithBezierPath(path);
+  return MSShapeGroup.layerWithPath(path);
 }
 
 var makeBasePlate = function(r, nThick){
@@ -355,7 +355,7 @@ var alert = function(sText, sTitle) {
 
 var getViewF = function(){
     //get position with view.postion.x etc and size with view.size.width etc.
-    view = [doc currentView];
+    view = [doc contentDrawView];
     return [view frame];
 }
 
