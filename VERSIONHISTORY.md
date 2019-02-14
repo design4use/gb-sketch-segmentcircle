@@ -1,5 +1,8 @@
 # Update history
 
+##### Feb 14, 2019
+* 2.07 version, updated to support Sketch 52,53 API changes
+
 ##### May 19, 2018
 * 2.04 version, updated to support Sketch 50 and SketchRunner
 
