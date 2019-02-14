@@ -1,4 +1,4 @@
-//(c)2016-2019 German Bauer. All code covered by the BSD 2-clause style license ./LICENSE.md in this package
+//(c)2019 German Bauer. All code covered by the BSD 2-clause style license ./LICENSE.md in this package
 
 var doc, pi, pArray, def, sv
 var r, segs, idealsegs, vals, thickness, omit, stMaj, stMin, nMaj, nMin, dash, gap
