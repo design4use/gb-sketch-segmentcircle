@@ -10,7 +10,7 @@
         <description>
           <![CDATA[
             <ul>
-              <li>Update v2.0.7, fix for selection issues after creation</li>
+              <li>Update v2.0.7, fix for selection issues and empty layers for Sketch 52,53</li>
             </ul>
           ]]>
         </description>
