@@ -8,7 +8,7 @@
     "homepage": "https://github.com/design4use/gb-sketch-segmentcircle",
     "version" : "2.07",
     "identifier" : "com.germanbauer.gb-segmented_circle",
-    "compatibleVersion": "3.4",
+    "compatibleVersion": "53",
     "bundleVersion": "1",
 
     "commands" : [
