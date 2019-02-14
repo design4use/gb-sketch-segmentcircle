@@ -355,7 +355,8 @@ var alert = function(sText, sTitle) {
 
 var getViewF = function(){
     //get position with view.postion.x etc and size with view.size.width etc.
-    view = [doc currentView];
+    //view = [doc currentView];
+    view = [doc contentDrawView];
     return [view frame];
 }
 
