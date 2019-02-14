@@ -428,7 +428,7 @@ var rszHndls = function(lyr){
   if(sv <= 34400) {
     lyr.resizeRoot(true)
   } else {
-    lyr.resizeToFitChildrenWithOption(0)
+    lyr.fixGeometryWithOptions(0)
   }
 }
 
