@@ -10,11 +10,11 @@
         <description>
           <![CDATA[
             <ul>
-              <li>Update v2.0.7, fix for selection issues and empty layers for Sketch 52,53</li>
+              <li>Fix for selection issues and empty layers for Sketch 52,53</li>
             </ul>
           ]]>
         </description>
-        <enclosure url="https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.071.zip" sparkle:version="2.0.71" />
+        <enclosure url="https://github.com/design4use/gb-sketch-segmentcircle/archive/master.zip" sparkle:version="2.0.71" />
       </item>
   </channel>
 </rss>
