@@ -6,7 +6,7 @@
     "icon" : "icon.png",
     "appcast" : "https://raw.githubusercontent.com/design4use/gb-sketch-segmentcircle/master/appcast.xml",
     "homepage": "https://github.com/design4use/gb-sketch-segmentcircle",
-    "version" : "2.07",
+    "version" : "2.071",
     "identifier" : "com.germanbauer.gb-segmented_circle",
     "compatibleVersion": "53",
     "bundleVersion": "1",
