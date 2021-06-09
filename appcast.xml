@@ -6,7 +6,7 @@
     <description>Create precise segmented circular graphics for diagrams, instrumentation and analytics</description>
     <language>en</language>
     <item>
-        <title>Version 2.0.7</title>
+        <title>Version 2.0.71</title>
         <description>
           <![CDATA[
             <ul>
@@ -14,7 +14,7 @@
             </ul>
           ]]>
         </description>
-        <enclosure url="https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.0.7.zip" sparkle:version="2.0.7" />
+        <enclosure url="https://github.com/design4use/gb-sketch-segmentcircle/archive/v2.071.zip" sparkle:version="2.0.71" />
       </item>
   </channel>
 </rss>
